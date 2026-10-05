@@ -1,4 +1,4 @@
-# Advanced Database Systems Portfolio — CarePoint Specialist Clinic
+# Advanced Database Systems Portfolio - CarePoint Specialist Clinic
 
 ## Case study
 CarePoint Specialist Clinic is a simulated outpatient clinic with three branches in Lagos (Ikeja, Lekki, Yaba).
