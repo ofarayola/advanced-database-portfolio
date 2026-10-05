@@ -2,11 +2,9 @@
 
 ## Case study
 CarePoint Specialist Clinic is a simulated outpatient clinic with three branches in Lagos (Ikeja, Lekki, Yaba).
-Users: front-desk staff, doctors, nurses, lab scientists, pharmacists, billing officers, patients.
-
-Data stored: patients, doctors, departments, branches, appointments, consultations, prescriptions, drugs and stock, lab tests and results, invoices and payments.
-
-Key operations: register patient, book/cancel appointment, record diagnosis, issue prescription (reducing stock), record lab results, bill and receive payment, retrieve patient history.
+**Users:** front-desk staff, doctors, nurses, lab scientists, pharmacists, billing officers, patients.
+**Data stored:** patients, doctors, departments, branches, appointments, consultations, prescriptions, drugs and stock, lab tests and results, invoices and payments.
+**Key operations:** register patient, book/cancel appointment, record diagnosis, issue prescription (reducing stock), record lab results, bill and receive payment, retrieve patient history.
 
 ## Portfolio index
 | Portfolio | Folder |
