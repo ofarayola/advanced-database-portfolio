@@ -1,6 +1,6 @@
 ﻿# Reflection Notes — MIT 8103 Portfolio
 
-## Week 1 (5–6 Oct 2026): Setup, case study, entities, ERD
+## Week 1 (5–6 Oct 2026): Setup, case study, entities, ERD, schema
 
 ### Design choices
 - **Case study:** CarePoint Specialist Clinic (3 branches in Lagos). Chose a clinic because
@@ -17,12 +17,31 @@
 - **vital_signs as its own table, with nurse_id:** vitals can be taken more than once per
   visit and are recorded by nurses, which also gives the nurse table a real role.
 - **HMO history:** hmo_mapping has enrollee_no, start_date and end_date so a change of HMO
-  keeps the old record. Rule: only one active HMO per patient (partial unique index in B4).
+  keeps the old record.
 - **Junction tables** for the M:N relationships: prescription_item, drug_stock, lab_order.
 
+### Schema decisions (B4)
+- **Named every constraint** (e.g. chk_temp, uq_doctor_slot) so error messages show
+  exactly which business rule was broken.
+- **Partial unique index for "one active HMO per patient":** a normal UNIQUE on patient_id
+  would stop a patient from ever having a past HMO record. Adding WHERE end_date IS NULL
+  applies the rule only to the current registration.
+- **UNIQUE on consultation.appointment_id and prescription.consultation_id** turns a
+  one-to-many foreign key into a one-to-one relationship.
+- **ON DELETE RESTRICT vs CASCADE:** medical records (patients, appointments,
+  consultations) use RESTRICT so they can never be deleted by accident.
+  prescription_item and vital_signs use CASCADE because they mean nothing without
+  their parent record.
+- **UNIQUE (doctor_id, start_time)** prevents double-booking a doctor's slot.
+- **CHECK constraints** enforce clinical and business rules in the database itself
+  (temperature 30–45 °C, systolic > diastolic, stock never negative, payment > 0,
+  a completed lab test must have a result), not just in application code.
+- **Table creation order:** parent tables (branch, department) are created before the
+  tables that reference them; otherwise the foreign keys fail.
+- **DROP SCHEMA ... CASCADE at the top** makes the script re-runnable, so I can fix
+  mistakes and rebuild the whole database in one step.
+
 ### Challenges and how I solved them
-- **psql not recognised:** PostgreSQL's bin folder wasn't on PATH. Added it to the user
-  Path variable; learned that terminals must be reopened to pick up the change.
 - **mongosh OpenSSL error:** the OPENSSL_CONF environment variable pointed to openssl.exe
   instead of a config file, and no config file existed. Deleting the variable fixed it.
   Lesson: one program's environment settings can break another.
@@ -37,10 +56,15 @@
   was still saved locally and pushed once I was back online. Committing (local) and pushing
   (remote) are separate steps, similar to how a replica keeps working during a network
   partition and syncs later (P5).
+- Created schema.sql. Named every constraint so error messages show which rule failed.
+  Used a partial unique index for "one active HMO per patient" because a normal UNIQUE
+  would block a patient from ever having a past HMO record.
 
 ### Lessons learned
 - Planning entities and cardinality before drawing saves rework.
 - Storing the same fact twice (redundancy) risks inconsistency; derive it when you can.
+- Business rules belong in the database (constraints), not only in the application,
+  because every program that touches the data must then obey them.
 - Small, frequent commits create a clear history of how the design evolved.
 
 ## AI use log
