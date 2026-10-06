@@ -1,6 +1,6 @@
 ﻿# Reflection Notes — MIT 8103 Portfolio
 
-## Week 1 (5–6 Oct 2026): Setup, case study, entities, ERD, schema
+## Week 1 (5–6 Oct 2026): Setup, case study, entities, ERD, schema, testing
 
 ### Design choices
 - **Case study:** CarePoint Specialist Clinic (3 branches in Lagos). Chose a clinic because
@@ -41,6 +41,19 @@
 - **DROP SCHEMA ... CASCADE at the top** makes the script re-runnable, so I can fix
   mistakes and rebuild the whole database in one step.
 
+### Testing decisions (B5)
+- **Realistic sample data:** 3 branches, 5 patients, 4 doctors, 6 appointments covering
+  every status (completed, scheduled, cancelled, no_show), and a doctor rotating to
+  another branch, to show the branch_id design decision in real data.
+- **Re-runnable test data:** sample-data.sql starts with TRUNCATE ... RESTART IDENTITY
+  CASCADE, so IDs always restart at 1 and the tests can refer to fixed IDs.
+- **Two kinds of test:** 16 negative tests (bad data that must be rejected) and
+  3 positive tests (correct behaviour that must succeed): the view updating when an HMO
+  ends, the partial index allowing a new HMO after the old one ends, and CASCADE
+  removing prescription items.
+- **Saved output as evidence:** ran the tests with psql -a and redirected the output to
+  test-results.txt, so each statement appears next to the error it produced.
+
 ### Challenges and how I solved them
 - **psql not recognised:** PostgreSQL's bin folder wasn't on PATH. Added it to the user
   Path variable; learned that terminals must be reopened to pick up the change.
@@ -64,12 +77,21 @@
   avoided foreign-key errors, and DROP SCHEMA ... CASCADE means I can safely re-run
   the script after any change. Verified with a count of tables in information_schema
   and a pgAdmin screenshot (screenshots/b4-tables-created.png).
+- **Constraint tests:** all 16 violations were rejected by the expected named
+  constraint, and all 3 positive tests succeeded (see test-results.txt).
+- **Positive tests change the data:** after running the tests once, patient 1's HMO had
+  ended and prescription 2 was deleted, so I learned to re-run sample-data.sql before
+  repeating the tests.
+- **Typing the password every time:** set $env:PGPASSWORD for the terminal session so
+  psql could run scripts without prompting, including when output is redirected to a file.
 
 ### Lessons learned
 - Planning entities and cardinality before drawing saves rework.
 - Storing the same fact twice (redundancy) risks inconsistency; derive it when you can.
 - Business rules belong in the database (constraints), not only in the application,
   because every program that touches the data must then obey them.
+- In constraint testing, an ERROR is the *desired* result: it proves the rule works.
+  Testing what should succeed matters too, so the rules are not too strict.
 - Small, frequent commits create a clear history of how the design evolved.
 
 ## AI use log
@@ -79,3 +101,4 @@
 | 5 Oct | Claude | Troubleshooting the PATH and OpenSSL errors | Ran the diagnostic commands and confirmed the fixes worked |
 | 5–6 Oct | Claude | Reviewing my entity list; feedback on my additions (nurse, vital_signs, HMO) | Chose which suggestions to accept; replaced uses_hmo with a view after weighing the trade-off |
 | 6 Oct | Claude | DBML syntax and ERD layout for dbdiagram.io | Checked the diagram's cardinalities against my entities.md |
+| 6 Oct | Claude | Sample data and constraint test scripts | Ran both, checked each error named the expected constraint, reviewed test-results.txt |
