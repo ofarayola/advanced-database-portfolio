@@ -1,0 +1,229 @@
+-- =====================================================================
+
+-- CarePoint Clinic - Constraint tests
+
+-- Run AFTER sample-data.sql. Tests 1-16 SHOULD FAIL with an ERROR.
+
+-- Tests P1-P3 SHOULD SUCCEED.
+
+-- =====================================================================
+
+SET search_path TO clinic;
+
+SET
+
+
+-- ---------- PART A: rules that must REJECT bad data ----------
+
+
+
+-- TEST 1: Duplicate hospital number  -> expect: patient_hospital_no_key
+
+INSERT INTO patient (hospital_no, full_name, date_of_birth, gender)
+
+VALUES ('CP-0001', 'Duplicate Person', '1990-01-01', 'F');
+
+psql:portfolio-1-database-design/test-constraints.sql:12: ERROR:  duplicate key value violates unique constraint "patient_hospital_no_key"
+DETAIL:  Key (hospital_no)=(CP-0001) already exists.
+
+
+-- TEST 2: Invalid gender  -> expect: chk_patient_gender
+
+INSERT INTO patient (hospital_no, full_name, date_of_birth, gender)
+
+VALUES ('CP-0099', 'Test Gender', '1990-01-01', 'X');
+
+psql:portfolio-1-database-design/test-constraints.sql:16: ERROR:  new row for relation "patient" violates check constraint "chk_patient_gender"
+DETAIL:  Failing row contains (7, CP-0099, Test Gender, 1990-01-01, X, null, null, null).
+
+
+-- TEST 3: Duplicate doctor licence number  -> expect: doctor_licence_no_key
+
+INSERT INTO doctor (department_id, full_name, licence_no)
+
+VALUES (1, 'Dr. Copy', 'MDCN-10234');
+
+psql:portfolio-1-database-design/test-constraints.sql:20: ERROR:  duplicate key value violates unique constraint "doctor_licence_no_key"
+DETAIL:  Key (licence_no)=(MDCN-10234) already exists.
+
+
+-- TEST 4: Appointment ends before it starts  -> expect: chk_appt_time
+
+INSERT INTO appointment (patient_id, doctor_id, branch_id, start_time, end_time)
+
+VALUES (3, 1, 1, '2026-10-20 10:00', '2026-10-20 09:30');
+
+psql:portfolio-1-database-design/test-constraints.sql:24: ERROR:  new row for relation "appointment" violates check constraint "chk_appt_time"
+DETAIL:  Failing row contains (7, 3, 1, 1, 2026-10-20 10:00:00, 2026-10-20 09:30:00, scheduled).
+
+
+-- TEST 5: Double-booking Dr. Okafor at 09:00 on 5 Oct  -> expect: uq_doctor_slot
+
+INSERT INTO appointment (patient_id, doctor_id, branch_id, start_time, end_time)
+
+VALUES (3, 1, 1, '2026-10-05 09:00', '2026-10-05 09:30');
+
+psql:portfolio-1-database-design/test-constraints.sql:28: ERROR:  duplicate key value violates unique constraint "uq_doctor_slot"
+DETAIL:  Key (doctor_id, start_time)=(1, 2026-10-05 09:00:00) already exists.
+
+
+-- TEST 6: Invalid appointment status  -> expect: chk_appt_status
+
+INSERT INTO appointment (patient_id, doctor_id, branch_id, start_time, end_time, status)
+
+VALUES (3, 1, 1, '2026-10-21 10:00', '2026-10-21 10:30', 'pending');
+
+psql:portfolio-1-database-design/test-constraints.sql:32: ERROR:  new row for relation "appointment" violates check constraint "chk_appt_status"
+DETAIL:  Failing row contains (9, 3, 1, 1, 2026-10-21 10:00:00, 2026-10-21 10:30:00, pending).
+
+
+-- TEST 7: Appointment for a patient who doesn't exist  -> expect: appointment_patient_id_fkey
+
+INSERT INTO appointment (patient_id, doctor_id, branch_id, start_time, end_time)
+
+VALUES (999, 1, 1, '2026-10-22 10:00', '2026-10-22 10:30');
+
+psql:portfolio-1-database-design/test-constraints.sql:36: ERROR:  insert or update on table "appointment" violates foreign key constraint "appointment_patient_id_fkey"
+DETAIL:  Key (patient_id)=(999) is not present in table "patient".
+
+
+-- TEST 8: Delete a patient who has appointments (RESTRICT)  -> expect: foreign key violation
+
+DELETE FROM patient WHERE patient_id = 1;
+
+psql:portfolio-1-database-design/test-constraints.sql:39: ERROR:  update or delete on table "patient" violates RESTRICT setting of foreign key constraint "hmo_mapping_patient_id_fkey" on table "hmo_mapping"
+DETAIL:  Key (patient_id)=(1) is referenced from table "hmo_mapping".
+
+
+-- TEST 9: Second consultation for the same appointment (1:1)  -> expect: consultation_appointment_id_key
+
+INSERT INTO consultation (appointment_id, diagnosis) VALUES (1, 'Duplicate visit');
+
+psql:portfolio-1-database-design/test-constraints.sql:42: ERROR:  duplicate key value violates unique constraint "consultation_appointment_id_key"
+DETAIL:  Key (appointment_id)=(1) already exists.
+
+
+-- TEST 10: Temperature 50 °C  -> expect: chk_temp
+
+INSERT INTO vital_signs (consultation_id, nurse_id, temp_celsius) VALUES (1, 1, 50.0);
+
+psql:portfolio-1-database-design/test-constraints.sql:45: ERROR:  new row for relation "vital_signs" violates check constraint "chk_temp"
+DETAIL:  Failing row contains (4, 1, 1, 50.0, null, null, null, 2026-10-06 17:24:55.082451).
+
+
+-- TEST 11: Systolic lower than diastolic (80/120)  -> expect: chk_bp
+
+INSERT INTO vital_signs (consultation_id, nurse_id, bp_systolic, bp_diastolic) VALUES (1, 1, 80, 120);
+
+psql:portfolio-1-database-design/test-constraints.sql:48: ERROR:  new row for relation "vital_signs" violates check constraint "chk_bp"
+DETAIL:  Failing row contains (5, 1, 1, null, 80, 120, null, 2026-10-06 17:24:55.082833).
+
+
+-- TEST 12: Lab test marked completed with no result  -> expect: chk_lab_result
+
+INSERT INTO lab_order (consultation_id, lab_test_id, status) VALUES (2, 1, 'completed');
+
+psql:portfolio-1-database-design/test-constraints.sql:51: ERROR:  new row for relation "lab_order" violates check constraint "chk_lab_result"
+DETAIL:  Failing row contains (3, 2, 1, completed, null, null).
+
+
+-- TEST 13: Dispense more drugs than in stock (500 - 1000)  -> expect: chk_stock_not_negative
+
+UPDATE drug_stock SET quantity_on_hand = quantity_on_hand - 1000
+
+WHERE branch_id = 1 AND drug_id = 1;
+
+psql:portfolio-1-database-design/test-constraints.sql:55: ERROR:  new row for relation "drug_stock" violates check constraint "chk_stock_not_negative"
+DETAIL:  Failing row contains (1, 1, -500, 100).
+
+
+-- TEST 14: Second ACTIVE HMO for patient 1  -> expect: uq_one_active_hmo_per_patient
+
+INSERT INTO hmo_mapping (hmo_id, patient_id, enrollee_no, start_date)
+
+VALUES (2, 1, 'AXA-99999', '2026-10-01');
+
+psql:portfolio-1-database-design/test-constraints.sql:59: ERROR:  duplicate key value violates unique constraint "uq_one_active_hmo_per_patient"
+DETAIL:  Key (patient_id)=(1) already exists.
+
+
+-- TEST 15: HMO end date before start date  -> expect: chk_hmo_dates
+
+INSERT INTO hmo_mapping (hmo_id, patient_id, enrollee_no, start_date, end_date)
+
+VALUES (1, 3, 'HYG-200001', '2026-05-01', '2026-01-01');
+
+psql:portfolio-1-database-design/test-constraints.sql:63: ERROR:  new row for relation "hmo_mapping" violates check constraint "chk_hmo_dates"
+DETAIL:  Failing row contains (5, 1, 3, HYG-200001, 2026-05-01, 2026-01-01).
+
+
+-- TEST 16: Payment of zero  -> expect: chk_payment_amount
+
+INSERT INTO payment (invoice_id, amount, method) VALUES (1, 0, 'cash');
+
+psql:portfolio-1-database-design/test-constraints.sql:66: ERROR:  new row for relation "payment" violates check constraint "chk_payment_amount"
+DETAIL:  Failing row contains (3, 1, 0.00, cash, 2026-10-06 17:24:55.08453).
+
+
+-- ---------- PART B: correct behaviour that must SUCCEED ----------
+
+
+
+-- P1: View updates automatically when an HMO ends
+
+SELECT * FROM patient_hmo_status WHERE patient_id = 1;          -- before: uses_hmo = t
+
+ patient_id |  full_name   | uses_hmo 
+------------+--------------+----------
+          1 | Adaeze Nwosu | t
+(1 row)
+
+UPDATE hmo_mapping SET end_date = '2026-10-06' WHERE register_id = 1;
+
+UPDATE 1
+SELECT * FROM patient_hmo_status WHERE patient_id = 1;          -- after:  uses_hmo = f
+
+ patient_id |  full_name   | uses_hmo 
+------------+--------------+----------
+          1 | Adaeze Nwosu | f
+(1 row)
+
+
+
+-- P2: Partial index allows a NEW active HMO once the old one has ended
+
+INSERT INTO hmo_mapping (hmo_id, patient_id, enrollee_no, start_date)
+
+VALUES (3, 1, 'REL-90001', '2026-10-07');
+
+INSERT 0 1
+SELECT register_id, hmo_id, enrollee_no, start_date, end_date
+
+FROM hmo_mapping WHERE patient_id = 1 ORDER BY start_date;      -- history kept: 2 rows
+
+ register_id | hmo_id | enrollee_no | start_date |  end_date  
+-------------+--------+-------------+------------+------------
+           1 |      1 | HYG-100234  | 2025-01-01 | 2026-10-06
+           6 |      3 | REL-90001   | 2026-10-07 | 
+(2 rows)
+
+
+
+-- P3: ON DELETE CASCADE removes prescription items with their prescription
+
+SELECT count(*) AS items_before FROM prescription_item WHERE prescription_id = 2;  -- 1
+
+ items_before 
+--------------
+            1
+(1 row)
+
+DELETE FROM prescription WHERE prescription_id = 2;
+
+DELETE 1
+SELECT count(*) AS items_after  FROM prescription_item WHERE prescription_id = 2;  -- 0
+ items_after 
+-------------
+           0
+(1 row)
+
