@@ -12,7 +12,7 @@
 in Lagos (Ikeja, Lekki and Yaba), offering consultations, laboratory tests and a pharmacy.
 
 | | |
-|---|---|wa
+|---|---|
 | **Nature of the business** | Multi-branch outpatient healthcare provider |
 | **Users of the database** | Front-desk staff, doctors, nurses, lab scientists, pharmacists, billing officers, patients |
 | **Major data stored** | Patients, HMO registrations, doctors, nurses, departments, branches, appointments, consultations, vital signs, lab tests and results, prescriptions, drugs and stock, invoices and payments |
