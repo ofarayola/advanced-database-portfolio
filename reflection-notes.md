@@ -42,6 +42,9 @@
   mistakes and rebuild the whole database in one step.
 
 ### Challenges and how I solved them
+- **psql not recognised:** PostgreSQL's bin folder wasn't on PATH. Added it to the user
+  Path variable; learned that terminals must be reopened to pick up the change.
+  Ran schema.sql from the VS Code terminal with psql -f once the Path fix worked.
 - **mongosh OpenSSL error:** the OPENSSL_CONF environment variable pointed to openssl.exe
   instead of a config file, and no config file existed. Deleting the variable fixed it.
   Lesson: one program's environment settings can break another.
@@ -56,9 +59,11 @@
   was still saved locally and pushed once I was back online. Committing (local) and pushing
   (remote) are separate steps, similar to how a replica keeps working during a network
   partition and syncs later (P5).
-- Created schema.sql. Named every constraint so error messages show which rule failed.
-  Used a partial unique index for "one active HMO per patient" because a normal UNIQUE
-  would block a patient from ever having a past HMO record.
+- **schema.sql ran first time:** 18 tables, 1 view and the partial unique index were
+  created with no errors. Creating tables in dependency order (parents before children)
+  avoided foreign-key errors, and DROP SCHEMA ... CASCADE means I can safely re-run
+  the script after any change. Verified with a count of tables in information_schema
+  and a pgAdmin screenshot (screenshots/b4-tables-created.png).
 
 ### Lessons learned
 - Planning entities and cardinality before drawing saves rework.
