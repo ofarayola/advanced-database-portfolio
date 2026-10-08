@@ -147,6 +147,12 @@
   NOT foreign keys. So Q1 finds the patient instantly but then scans all 60,000
   appointments to find their 12 visits.
 
+### P2 wrap-up
+- Wrote the P2 README with method, headline results and key findings, so the assessor
+  can follow the work without reading every plan.
+- If I did P2 again, I would measure write cost (INSERT speed) alongside read speed,
+  since every index slows down writes.
+
 ### Challenges
 - **"Import psycopg2 could not be resolved" (Pylance):** VS Code was checking a different
   Python installation from the one pip had installed the libraries into. I confirmed the
@@ -165,3 +171,4 @@
 | 6 Oct | Claude | Sample data and constraint test scripts | Ran both, checked each error named the expected constraint, reviewed test-results.txt |
 | 6–7 Oct | Claude | Structuring the normalisation write-up, P1 README and main README | Checked every functional dependency against my own tables; matched screenshot names to my files; filled in my own details |
 | 8 Oct | Claude | Python data generator for P2 | Read each section, ran it, verified row counts and status distribution in psql |
+| 8–9 Oct | Claude | Index design, Q2 rewrite, explaining the idx_scan counts, results and README structure | Ran every script, compared all numbers with my own plans, tested the planner-statistics explanation myself |
