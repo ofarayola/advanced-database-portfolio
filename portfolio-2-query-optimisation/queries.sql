@@ -24,7 +24,8 @@ FROM appointment a
 JOIN doctor d  ON d.doctor_id  = a.doctor_id
 JOIN patient p ON p.patient_id = a.patient_id
 WHERE a.branch_id = 2
-  AND DATE(a.start_time) = '2026-10-13'
+ -- Rewritten in P2: range condition lets idx_appointment_branch_start be used
+  AND a.start_time >= '2026-10-13' AND a.start_time < '2026-10-14'
 ORDER BY a.start_time;
 
 -- Q3. MONTHLY REVENUE PER BRANCH (management)
