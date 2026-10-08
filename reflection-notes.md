@@ -138,6 +138,15 @@
   doctor's schedule query is fast before I add any index. Constraints create indexes as
   a side effect, which I need to account for in my analysis.
 
+### Queries and baseline (P2)
+- Wrote 8 queries based on real clinic roles (front desk, lab, pharmacy, billing,
+  management), including multi-table joins, aggregation and a window function (RANK).
+- Kept the EXPLAIN versions in a separate file so the before and after runs use
+  exactly the same queries, and ran each twice so the timing isn't distorted by a cold cache.
+- Main finding: PostgreSQL indexes primary keys and UNIQUE columns automatically, but
+  NOT foreign keys. So Q1 finds the patient instantly but then scans all 60,000
+  appointments to find their 12 visits.
+
 ### Challenges
 - **"Import psycopg2 could not be resolved" (Pylance):** VS Code was checking a different
   Python installation from the one pip had installed the libraries into. I confirmed the
