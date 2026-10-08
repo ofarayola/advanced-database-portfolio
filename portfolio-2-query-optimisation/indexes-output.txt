@@ -1,0 +1,22 @@
+SET
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+          indexname           |  size   
+------------------------------+---------
+ idx_appointment_branch_start | 1424 kB
+ idx_appointment_patient      | 872 kB
+ idx_invoice_issued_at        | 608 kB
+ idx_invoice_unpaid           | 200 kB
+ idx_lab_order_pending        | 16 kB
+ idx_payment_invoice          | 888 kB
+ idx_vitals_consultation      | 1000 kB
+ idx_vitals_recorded_at       | 640 kB
+(8 rows)
+

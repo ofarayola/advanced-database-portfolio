@@ -1,0 +1,29 @@
+--- Run 1 ---
+
+ Execution Time: 0.387 ms
+ Execution Time: 4.906 ms
+ Execution Time: 26.447 ms
+ Execution Time: 17.056 ms
+ Execution Time: 2.004 ms
+ Execution Time: 22.536 ms
+ Execution Time: 9.463 ms
+ Execution Time: 10.813 ms
+--- Run 2 ---
+ Execution Time: 0.378 ms
+ Execution Time: 4.147 ms
+ Execution Time: 24.517 ms
+ Execution Time: 17.586 ms
+ Execution Time: 1.553 ms
+ Execution Time: 24.010 ms
+ Execution Time: 9.559 ms
+ Execution Time: 11.390 ms
+--- Run 3 ---
+ Execution Time: 0.355 ms
+ Execution Time: 4.112 ms
+ Execution Time: 23.793 ms
+ Execution Time: 18.549 ms
+ Execution Time: 1.532 ms
+ Execution Time: 24.560 ms
+ Execution Time: 9.103 ms
+ Execution Time: 12.017 ms
+

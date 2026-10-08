@@ -1,0 +1,12 @@
+            index             | times_used |  size   
+------------------------------+------------+---------
+ idx_vitals_recorded_at       |          5 | 640 kB
+ idx_invoice_unpaid           |          5 | 200 kB
+ idx_invoice_issued_at        |          5 | 608 kB
+ idx_lab_order_pending        |          5 | 16 kB
+ idx_vitals_consultation      |         10 | 1000 kB
+ idx_payment_invoice          |         10 | 888 kB
+ idx_appointment_branch_start |         36 | 1424 kB
+ idx_appointment_patient      |         49 | 872 kB
+(8 rows)
+
