@@ -30,8 +30,8 @@ in Lagos (Ikeja, Lekki and Yaba), offering consultations, laboratory tests and a
 | # | Portfolio | Status | Key evidence |
 |---|---|---|---|
 | 1 | [Database Design and Modelling](portfolio-1-database-design/) | ✅ Complete | ER diagram (18 tables), schema with named constraints, normalisation UNF→3NF/BCNF, 16 constraint tests passed |
-| 2 | [Query Processing and Optimisation](portfolio-2-query-optimisation/) | ⏳ In progress | — |
-| 3 | [Transactions and Concurrency](portfolio-3-transactions-concurrency/) | ⬜ Not started | — |
+| 2 | [Query Processing and Optimisation](portfolio-2-query-optimisation/) | ✅ Complete |  8 queries, before/after EXPLAIN ANALYZE; Q1 17× and Q2 20× faster; partial indexes; PostgreSQL 18 skip scan observed |
+| 3 | [Transactions and Concurrency](portfolio-3-transactions-concurrency/) | ⏳ In Progress | — |
 | 4 | [NoSQL and Advanced Data Models](portfolio-4-nosql/) | ⬜ Not started | — |
 | 5 | [Distributed and Cloud Database](portfolio-5-distributed-cloud/) | ⬜ Not started | — |
 
