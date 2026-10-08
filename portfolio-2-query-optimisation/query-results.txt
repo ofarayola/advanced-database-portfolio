@@ -1,0 +1,385 @@
+SET
+ hospital_no |  full_name   |     start_time      | branch |         doctor         |  status   |             diagnosis             
+-------------+--------------+---------------------+--------+------------------------+-----------+-----------------------------------
+ CP-011210   | Mary Adeyemi | 2026-12-10 09:30:00 | Ikeja  | Dr. Elizabeth Olawale  | scheduled | 
+ CP-011210   | Mary Adeyemi | 2026-11-21 08:30:00 | Lekki  | Dr. Blessing Nnamani   | scheduled | 
+ CP-011210   | Mary Adeyemi | 2026-10-26 08:30:00 | Lekki  | Dr. Samuel Chukwu      | scheduled | 
+ CP-011210   | Mary Adeyemi | 2026-05-08 14:30:00 | Lekki  | Dr. Samuel Okafor      | completed | Typhoid Fever
+ CP-011210   | Mary Adeyemi | 2026-04-09 08:30:00 | Ikeja  | Dr. Emmanuel Balogun   | no_show   | 
+ CP-011210   | Mary Adeyemi | 2025-12-13 13:30:00 | Lekki  | Dr. Peace Okafor       | completed | Urinary Tract Infection
+ CP-011210   | Mary Adeyemi | 2025-09-16 11:30:00 | Ikeja  | Dr. Peter Okonkwo      | completed | Upper Respiratory Tract Infection
+ CP-011210   | Mary Adeyemi | 2025-09-12 14:30:00 | Ikeja  | Dr. Peter Okonkwo      | completed | Asthma
+ CP-011210   | Mary Adeyemi | 2025-09-10 09:00:00 | Ikeja  | Dr. Andrew Okafor      | cancelled | 
+ CP-011210   | Mary Adeyemi | 2024-10-14 08:00:00 | Yaba   | Dr. Gloria Oshodi      | completed | Peptic Ulcer Disease
+ CP-011210   | Mary Adeyemi | 2024-10-02 09:00:00 | Lekki  | Dr. Peace Okafor       | completed | Urinary Tract Infection
+ CP-011210   | Mary Adeyemi | 2024-06-21 08:30:00 | Lekki  | Dr. Michael Adetokunbo | completed | Upper Respiratory Tract Infection
+(12 rows)
+
+     start_time      |      end_time       |         doctor          |      patient       |  status   
+---------------------+---------------------+-------------------------+--------------------+-----------
+ 2026-10-13 08:00:00 | 2026-10-13 08:30:00 | Dr. David Abiola        | Joshua Uche        | scheduled
+ 2026-10-13 08:00:00 | 2026-10-13 08:30:00 | Dr. Blessing Nnamani    | Charity Oshodi     | scheduled
+ 2026-10-13 08:30:00 | 2026-10-13 09:00:00 | Dr. Mary Adetokunbo     | Philip Eze         | scheduled
+ 2026-10-13 09:00:00 | 2026-10-13 09:30:00 | Dr. Blessing Nnamani    | Benjamin Uche      | scheduled
+ 2026-10-13 10:00:00 | 2026-10-13 10:30:00 | Dr. Mary Adetokunbo     | Faith Oyekan       | scheduled
+ 2026-10-13 11:00:00 | 2026-10-13 11:30:00 | Dr. David Adeyemi       | Deborah Obi        | scheduled
+ 2026-10-13 11:00:00 | 2026-10-13 11:30:00 | Dr. Blessing Adetokunbo | Joseph Adetokunbo  | scheduled
+ 2026-10-13 11:30:00 | 2026-10-13 12:00:00 | Dr. Comfort Okafor      | Philip Uche        | scheduled
+ 2026-10-13 11:30:00 | 2026-10-13 12:00:00 | Dr. Andrew Oshodi       | Philip Obi         | scheduled
+ 2026-10-13 11:30:00 | 2026-10-13 12:00:00 | Dr. Mary Adetokunbo     | Simon Obi          | scheduled
+ 2026-10-13 12:00:00 | 2026-10-13 12:30:00 | Dr. Nathaniel Olawale   | Simon Okafor       | scheduled
+ 2026-10-13 12:30:00 | 2026-10-13 13:00:00 | Dr. Nathaniel Olawale   | Daniel Balogun     | scheduled
+ 2026-10-13 13:30:00 | 2026-10-13 14:00:00 | Dr. David Adeyemi       | Victoria Ogunleye  | scheduled
+ 2026-10-13 14:00:00 | 2026-10-13 14:30:00 | Dr. Blessing Nnamani    | Angela Eze         | scheduled
+ 2026-10-13 14:30:00 | 2026-10-13 15:00:00 | Dr. Gabriel Ojo         | Cornelius Eze      | scheduled
+ 2026-10-13 14:30:00 | 2026-10-13 15:00:00 | Dr. Nathaniel Olawale   | Comfort Abiola     | scheduled
+ 2026-10-13 14:30:00 | 2026-10-13 15:00:00 | Dr. Blessing Adetokunbo | Elizabeth Ogunleye | scheduled
+ 2026-10-13 15:00:00 | 2026-10-13 15:30:00 | Dr. Simon Olawale       | Sarah Chukwu       | scheduled
+ 2026-10-13 15:00:00 | 2026-10-13 15:30:00 | Dr. Blessing Nnamani    | Michael Oyekan     | scheduled
+ 2026-10-13 15:00:00 | 2026-10-13 15:30:00 | Dr. Joseph Adetokunbo   | Simon Ibrahim      | scheduled
+ 2026-10-13 15:30:00 | 2026-10-13 16:00:00 | Dr. Comfort Okafor      | Gabriel Obi        | scheduled
+ 2026-10-13 15:30:00 | 2026-10-13 16:00:00 | Dr. Nathaniel Olawale   | Andrew Oshodi      | scheduled
+(22 rows)
+
+ branch |   month    | invoices |   revenue   
+--------+------------+----------+-------------
+ Ikeja  | 2025-01-01 |      482 | 10361380.00
+ Ikeja  | 2025-02-01 |      361 |  7790940.00
+ Ikeja  | 2025-03-01 |      399 |  8619880.00
+ Ikeja  | 2025-04-01 |      419 |  8601320.00
+ Ikeja  | 2025-05-01 |      458 |  9572070.00
+ Ikeja  | 2025-06-01 |      413 |  9287270.00
+ Ikeja  | 2025-07-01 |      425 |  9155680.00
+ Ikeja  | 2025-08-01 |      451 |  9494930.00
+ Ikeja  | 2025-09-01 |      397 |  8307990.00
+ Ikeja  | 2025-10-01 |      455 | 10379850.00
+ Ikeja  | 2025-11-01 |      426 |  9020680.00
+ Ikeja  | 2025-12-01 |      478 |  9949430.00
+ Lekki  | 2025-01-01 |      408 |  8798750.00
+ Lekki  | 2025-02-01 |      372 |  7654250.00
+ Lekki  | 2025-03-01 |      431 |  9893680.00
+ Lekki  | 2025-04-01 |      404 |  9006490.00
+ Lekki  | 2025-05-01 |      422 |  9308340.00
+ Lekki  | 2025-06-01 |      397 |  8951460.00
+ Lekki  | 2025-07-01 |      470 |  9224780.00
+ Lekki  | 2025-08-01 |      424 |  9178910.00
+ Lekki  | 2025-09-01 |      445 | 10158760.00
+ Lekki  | 2025-10-01 |      392 |  8400370.00
+ Lekki  | 2025-11-01 |      408 |  8667400.00
+ Lekki  | 2025-12-01 |      444 |  9412710.00
+ Yaba   | 2025-01-01 |      428 |  9373680.00
+ Yaba   | 2025-02-01 |      361 |  7370390.00
+ Yaba   | 2025-03-01 |      405 |  8301210.00
+ Yaba   | 2025-04-01 |      400 |  7998460.00
+ Yaba   | 2025-05-01 |      424 |  9021890.00
+ Yaba   | 2025-06-01 |      406 |  8751400.00
+ Yaba   | 2025-07-01 |      418 |  9156710.00
+ Yaba   | 2025-08-01 |      410 |  8323900.00
+ Yaba   | 2025-09-01 |      422 |  9014460.00
+ Yaba   | 2025-10-01 |      440 |  9641870.00
+ Yaba   | 2025-11-01 |      380 |  8252110.00
+ Yaba   | 2025-12-01 |      428 |  9463690.00
+(36 rows)
+
+          name           | strength | units | times_prescribed 
+-------------------------+----------+-------+------------------
+ Paracetamol             | 500mg    | 48444 |             2288
+ Ciprofloxacin           | 500mg    | 39260 |             1878
+ Ferrous Sulphate        | 200mg    | 31782 |             1509
+ Folic Acid              | 5mg      | 30766 |             1470
+ Omeprazole              | 20mg     | 23714 |             1146
+ Salbutamol              | 100mcg   | 23094 |             1095
+ Metformin               | 500mg    | 22696 |             1087
+ Ibuprofen               | 400mg    | 17462 |              836
+ Artemether/Lumefantrine | 20/120mg | 17342 |              819
+ Diclofenac              | 50mg     | 16724 |              799
+(10 rows)
+
+ lab_order_id |           test           |       patient        |     ordered_at      
+--------------+--------------------------+----------------------+---------------------
+        13503 | Malaria Parasite (MP)    | Elizabeth Adetokunbo | 2026-10-06 08:05:00
+        13951 | Full Blood Count         | Andrew Ogunleye      | 2026-10-06 08:35:00
+        12126 | Full Blood Count         | Hope Adeyemi         | 2026-10-06 08:35:00
+        15565 | Full Blood Count         | Patience Ibrahim     | 2026-10-06 09:35:00
+        33227 | Full Blood Count         | Faith Ogunleye       | 2026-10-06 10:05:00
+        28297 | Widal Test               | Gloria Nnamani       | 2026-10-06 10:05:00
+        28298 | Full Blood Count         | Gloria Nnamani       | 2026-10-06 10:05:00
+        10739 | HbA1c                    | Philip Adetokunbo    | 2026-10-06 10:35:00
+        32158 | Chest X-Ray              | Angela Oyekan        | 2026-10-06 11:05:00
+        29869 | Full Blood Count         | Grace Abiola         | 2026-10-06 11:35:00
+         7170 | Full Blood Count         | Hope Akinwale        | 2026-10-06 11:35:00
+        14756 | Urinalysis               | Patience Ogunleye    | 2026-10-06 12:05:00
+         4138 | Full Blood Count         | Blessing Chukwu      | 2026-10-06 12:05:00
+         4137 | Malaria Parasite (MP)    | Blessing Chukwu      | 2026-10-06 12:05:00
+        16167 | Full Blood Count         | Ruth Akinwale        | 2026-10-06 12:35:00
+        31613 | Urinalysis               | Ruth Balogun         | 2026-10-06 12:35:00
+        31612 | Full Blood Count         | Ruth Balogun         | 2026-10-06 12:35:00
+         9342 | Full Blood Count         | Hope Obasanjo        | 2026-10-06 13:05:00
+        20080 | Full Blood Count         | Esther Ojo           | 2026-10-06 13:05:00
+        21413 | Full Blood Count         | Peter Nnamani        | 2026-10-06 14:05:00
+        19902 | Full Blood Count         | Esther Obasanjo      | 2026-10-06 14:05:00
+        18392 | Full Blood Count         | Joshua Ojo           | 2026-10-06 14:05:00
+          874 | Full Blood Count         | Peace Adetokunbo     | 2026-10-06 14:35:00
+        24916 | Fasting Blood Sugar      | Agnes Ekwueme        | 2026-10-06 15:05:00
+        18669 | Urinalysis               | Michael Ojo          | 2026-10-06 15:35:00
+        31107 | Urinalysis               | Simon Chukwu         | 2026-10-06 15:35:00
+        31106 | Full Blood Count         | Simon Chukwu         | 2026-10-06 15:35:00
+        15855 | Urinalysis               | Cornelius Uche       | 2026-10-06 15:35:00
+        25214 | Malaria Parasite (MP)    | Joseph Ekwueme       | 2026-10-06 15:35:00
+         8600 | Malaria Parasite (MP)    | Sarah Ibrahim        | 2026-10-07 08:05:00
+          183 | Full Blood Count         | Michael Eze          | 2026-10-07 08:05:00
+        12922 | Full Blood Count         | Daniel Obasanjo      | 2026-10-07 08:05:00
+        13600 | Full Blood Count         | Stephen Oshodi       | 2026-10-07 08:35:00
+        13601 | Urinalysis               | Stephen Oshodi       | 2026-10-07 08:35:00
+         8850 | Full Blood Count         | Emmanuel Ibrahim     | 2026-10-07 09:05:00
+        12163 | Full Blood Count         | Elizabeth Okafor     | 2026-10-07 09:05:00
+        29131 | Chest X-Ray              | Gloria Olawale       | 2026-10-07 09:05:00
+        29264 | Fasting Blood Sugar      | Victoria Olawale     | 2026-10-07 09:05:00
+        21983 | Kidney Function (E/U/Cr) | Joseph Ibrahim       | 2026-10-07 09:05:00
+         8666 | Widal Test               | Angela Uche          | 2026-10-07 09:35:00
+        17222 | Urinalysis               | Faith Okonkwo        | 2026-10-07 09:35:00
+        28130 | Full Blood Count         | Gabriel Ekwueme      | 2026-10-07 09:35:00
+         6717 | HbA1c                    | Andrew Obi           | 2026-10-07 09:35:00
+        28183 | Full Blood Count         | Esther Balogun       | 2026-10-07 10:05:00
+        10496 | Full Blood Count         | Comfort Akinwale     | 2026-10-07 10:35:00
+        10495 | Widal Test               | Comfort Akinwale     | 2026-10-07 10:35:00
+        27101 | Full Blood Count         | James Oyekan         | 2026-10-07 10:35:00
+        32864 | Kidney Function (E/U/Cr) | Agnes Adetokunbo     | 2026-10-07 10:35:00
+        32863 | Lipid Profile            | Agnes Adetokunbo     | 2026-10-07 10:35:00
+         3794 | Fasting Blood Sugar      | Agnes Chukwu         | 2026-10-07 10:35:00
+         7905 | Fasting Blood Sugar      | Michael Ibrahim      | 2026-10-07 11:05:00
+         3826 | Full Blood Count         | David Adetokunbo     | 2026-10-07 11:05:00
+         6955 | Widal Test               | Simon Eze            | 2026-10-07 11:05:00
+        19784 | Full Blood Count         | Deborah Ojo          | 2026-10-07 11:05:00
+        24442 | Kidney Function (E/U/Cr) | Mary Balogun         | 2026-10-07 11:05:00
+         7906 | HbA1c                    | Michael Ibrahim      | 2026-10-07 11:05:00
+        24441 | Lipid Profile            | Mary Balogun         | 2026-10-07 11:05:00
+         4557 | Widal Test               | Joshua Chukwu        | 2026-10-07 11:35:00
+         2199 | Full Blood Count         | Cornelius Akinwale   | 2026-10-07 11:35:00
+         4391 | Full Blood Count         | Nathaniel Oshodi     | 2026-10-07 11:35:00
+        27758 | Full Blood Count         | Peace Akinwale       | 2026-10-07 12:05:00
+         6116 | Full Blood Count         | Daniel Akinwale      | 2026-10-07 12:35:00
+         6115 | Malaria Parasite (MP)    | Daniel Akinwale      | 2026-10-07 12:35:00
+        14420 | Malaria Parasite (MP)    | Elizabeth Adeyemi    | 2026-10-07 12:35:00
+        14421 | Full Blood Count         | Elizabeth Adeyemi    | 2026-10-07 12:35:00
+        31121 | Kidney Function (E/U/Cr) | John Eze             | 2026-10-07 13:05:00
+        31266 | Kidney Function (E/U/Cr) | Gabriel Adetokunbo   | 2026-10-07 13:05:00
+        31265 | Lipid Profile            | Gabriel Adetokunbo   | 2026-10-07 13:05:00
+        14461 | Urinalysis               | Juliet Adetokunbo    | 2026-10-07 13:05:00
+        31120 | Lipid Profile            | John Eze             | 2026-10-07 13:05:00
+        13853 | Widal Test               | Peter Obi            | 2026-10-07 13:35:00
+        13125 | Urinalysis               | Esther Ibrahim       | 2026-10-07 14:05:00
+        20864 | Full Blood Count         | Philip Ibrahim       | 2026-10-07 14:05:00
+        32405 | Malaria Parasite (MP)    | Simon Olawale        | 2026-10-07 14:05:00
+        17632 | Lipid Profile            | Gabriel Chukwu       | 2026-10-07 14:35:00
+        18239 | Chest X-Ray              | Philip Nnamani       | 2026-10-07 15:35:00
+        12966 | Full Blood Count         | Patience Akinwale    | 2026-10-07 15:35:00
+        10108 | Full Blood Count         | Daniel Nnamani       | 2026-10-08 08:05:00
+        18003 | Malaria Parasite (MP)    | Hope Ekwueme         | 2026-10-08 08:05:00
+        23869 | Full Blood Count         | Joseph Abiola        | 2026-10-08 08:05:00
+        18004 | Full Blood Count         | Hope Ekwueme         | 2026-10-08 08:05:00
+        17804 | Full Blood Count         | Gabriel Balogun      | 2026-10-08 08:35:00
+        30338 | Full Blood Count         | Esther Balogun       | 2026-10-08 09:05:00
+        21743 | Full Blood Count         | Agnes Olawale        | 2026-10-08 09:05:00
+          954 | Widal Test               | Simon Adetokunbo     | 2026-10-08 09:35:00
+        22703 | Full Blood Count         | Stephen Akinwale     | 2026-10-08 09:35:00
+        31868 | Widal Test               | Cornelius Uche       | 2026-10-08 09:35:00
+        29698 | Full Blood Count         | Mary Chukwu          | 2026-10-08 10:05:00
+         8523 | Full Blood Count         | Paul Uche            | 2026-10-08 10:05:00
+        31922 | Lipid Profile            | Daniel Abiola        | 2026-10-08 10:05:00
+        31923 | Kidney Function (E/U/Cr) | Daniel Abiola        | 2026-10-08 10:05:00
+         2034 | Urinalysis               | Joy Okafor           | 2026-10-08 10:05:00
+        11055 | Full Blood Count         | Joshua Ekwueme       | 2026-10-08 10:35:00
+        19162 | Full Blood Count         | John Balogun         | 2026-10-08 11:05:00
+        26305 | Chest X-Ray              | Mary Adetokunbo      | 2026-10-08 11:05:00
+        17242 | Kidney Function (E/U/Cr) | Esther Okafor        | 2026-10-08 11:35:00
+        14494 | Full Blood Count         | Samuel Chukwu        | 2026-10-08 12:05:00
+        16218 | Full Blood Count         | Joy Ibrahim          | 2026-10-08 12:35:00
+        14426 | Full Blood Count         | Paul Uche            | 2026-10-08 13:05:00
+        17793 | Urinalysis               | Hope Olawale         | 2026-10-08 13:05:00
+         1952 | Full Blood Count         | Juliet Abiola        | 2026-10-08 13:35:00
+         6125 | Widal Test               | Elizabeth Ekwueme    | 2026-10-08 13:35:00
+         6126 | Full Blood Count         | Elizabeth Ekwueme    | 2026-10-08 13:35:00
+        20798 | Full Blood Count         | Juliet Nnamani       | 2026-10-08 13:35:00
+        20799 | Urinalysis               | Juliet Nnamani       | 2026-10-08 13:35:00
+        16383 | Chest X-Ray              | Sarah Eze            | 2026-10-08 13:35:00
+(106 rows)
+
+ invoice_id | hospital_no |     full_name      | total_amount | paid |  balance  
+------------+-------------+--------------------+--------------+------+-----------
+       4686 | CP-009525   | Joy Akinwale       |    100000.00 |    0 | 100000.00
+      12391 | CP-002746   | Michael Obasanjo   |    100000.00 |    0 | 100000.00
+      29634 | CP-011857   | Esther Ekwueme     |    100000.00 |    0 | 100000.00
+      17953 | CP-000048   | Deborah Oshodi     |    100000.00 |    0 | 100000.00
+      34222 | CP-009746   | Cornelius Uche     |    100000.00 |    0 | 100000.00
+      17366 | CP-005402   | Gabriel Uche       |    100000.00 |    0 | 100000.00
+      36966 | CP-004841   | Esther Olawale     |    100000.00 |    0 | 100000.00
+      21910 | CP-011418   | Patience Chukwu    |    100000.00 |    0 | 100000.00
+       2402 | CP-011737   | Benjamin Balogun   |    100000.00 |    0 | 100000.00
+        911 | CP-009412   | Elizabeth Ogunleye |    100000.00 |    0 | 100000.00
+      32308 | CP-015899   | James Ekwueme      |    100000.00 |    0 | 100000.00
+      31751 | CP-006907   | Samuel Uche        |    100000.00 |    0 | 100000.00
+      40307 | CP-019593   | Joy Olawale        |    100000.00 |    0 | 100000.00
+      12002 | CP-006250   | Nathaniel Olawale  |    100000.00 |    0 | 100000.00
+      21067 | CP-016683   | Mary Uche          |    100000.00 |    0 | 100000.00
+       5986 | CP-004046   | Mary Balogun       |    100000.00 |    0 | 100000.00
+      33886 | CP-017195   | Faith Abiola       |     95000.00 |    0 |  95000.00
+      11664 | CP-000265   | Sarah Oshodi       |     95000.00 |    0 |  95000.00
+      31089 | CP-017553   | Peace Ekwueme      |     95000.00 |    0 |  95000.00
+      38493 | CP-009566   | Blessing Obi       |     95000.00 |    0 |  95000.00
+(20 rows)
+
+ branch |          doctor          | consultations | rank_in_branch 
+--------+--------------------------+---------------+----------------
+ Ikeja  | Dr. Andrew Ogunleye      |           472 |              1
+ Ikeja  | Dr. Andrew Okafor        |           465 |              2
+ Ikeja  | Dr. Peace Olawale        |           445 |              3
+ Ikeja  | Dr. Michael Adetokunbo   |           400 |              4
+ Ikeja  | Dr. Elizabeth Olawale    |           397 |              5
+ Ikeja  | Dr. John Obi             |           391 |              6
+ Ikeja  | Dr. Comfort Abiola       |           375 |              7
+ Ikeja  | Dr. Grace Balogun        |           350 |              8
+ Ikeja  | Dr. Stephen Eze          |           324 |              9
+ Ikeja  | Dr. Emmanuel Balogun     |           266 |             10
+ Ikeja  | Dr. Joy Nnamani          |           254 |             11
+ Ikeja  | Dr. Peter Ekwueme        |           174 |             12
+ Ikeja  | Dr. Stephen Ekwueme      |           149 |             13
+ Ikeja  | Dr. Peter Okonkwo        |           141 |             14
+ Ikeja  | Dr. Gloria Oshodi        |            36 |             15
+ Ikeja  | Dr. James Okafor         |            30 |             16
+ Ikeja  | Dr. Blessing Nnamani     |            30 |             16
+ Ikeja  | Dr. Mary Adetokunbo      |            29 |             18
+ Ikeja  | Dr. Patience Okafor      |            29 |             18
+ Ikeja  | Dr. Gabriel Ojo          |            29 |             18
+ Ikeja  | Dr. Comfort Okafor       |            26 |             21
+ Ikeja  | Dr. Ruth Ojo             |            26 |             21
+ Ikeja  | Dr. David Adeyemi        |            25 |             23
+ Ikeja  | Dr. Joseph Adetokunbo    |            23 |             24
+ Ikeja  | Dr. Simon Olawale        |            23 |             24
+ Ikeja  | Dr. Nathaniel Olawale    |            22 |             26
+ Ikeja  | Dr. Elizabeth Adetokunbo |            22 |             26
+ Ikeja  | Dr. Daniel Akinwale      |            21 |             28
+ Ikeja  | Dr. John Balogun         |            19 |             29
+ Ikeja  | Dr. Peace Okafor         |            19 |             29
+ Ikeja  | Dr. Andrew Oshodi        |            17 |             31
+ Ikeja  | Dr. David Abiola         |            16 |             32
+ Ikeja  | Dr. Gloria Chukwu        |            15 |             33
+ Ikeja  | Dr. Faith Nnamani        |            15 |             33
+ Ikeja  | Dr. Samuel Okafor        |            14 |             35
+ Ikeja  | Dr. Agnes Balogun        |            14 |             35
+ Ikeja  | Dr. Deborah Obi          |            13 |             37
+ Ikeja  | Dr. Samuel Chukwu        |            13 |             37
+ Ikeja  | Dr. Patience Nnamani     |            13 |             37
+ Ikeja  | Dr. Blessing Adetokunbo  |            11 |             40
+ Ikeja  | Dr. Grace Chukwu         |             6 |             41
+ Ikeja  | Dr. Blessing Eze         |             5 |             42
+ Lekki  | Dr. Mary Adetokunbo      |           498 |              1
+ Lekki  | Dr. Comfort Okafor       |           442 |              2
+ Lekki  | Dr. Blessing Nnamani     |           433 |              3
+ Lekki  | Dr. Simon Olawale        |           406 |              4
+ Lekki  | Dr. Peace Okafor         |           405 |              5
+ Lekki  | Dr. Andrew Oshodi        |           346 |              6
+ Lekki  | Dr. David Adeyemi        |           322 |              7
+ Lekki  | Dr. Nathaniel Olawale    |           316 |              8
+ Lekki  | Dr. Joseph Adetokunbo    |           292 |              9
+ Lekki  | Dr. Blessing Adetokunbo  |           267 |             10
+ Lekki  | Dr. Patience Nnamani     |           248 |             11
+ Lekki  | Dr. David Abiola         |           210 |             12
+ Lekki  | Dr. Faith Nnamani        |           173 |             13
+ Lekki  | Dr. Samuel Okafor        |           167 |             14
+ Lekki  | Dr. Gloria Oshodi        |            33 |             15
+ Lekki  | Dr. Ruth Ojo             |            31 |             16
+ Lekki  | Dr. Daniel Akinwale      |            29 |             17
+ Lekki  | Dr. Andrew Okafor        |            28 |             18
+ Lekki  | Dr. Andrew Ogunleye      |            26 |             19
+ Lekki  | Dr. Gabriel Ojo          |            23 |             20
+ Lekki  | Dr. Grace Balogun        |            21 |             21
+ Lekki  | Dr. Agnes Balogun        |            21 |             21
+ Lekki  | Dr. Patience Okafor      |            21 |             21
+ Lekki  | Dr. Elizabeth Adetokunbo |            21 |             21
+ Lekki  | Dr. James Okafor         |            19 |             25
+ Lekki  | Dr. Comfort Abiola       |            18 |             26
+ Lekki  | Dr. Michael Adetokunbo   |            18 |             26
+ Lekki  | Dr. Emmanuel Balogun     |            17 |             28
+ Lekki  | Dr. John Obi             |            17 |             28
+ Lekki  | Dr. Peace Olawale        |            16 |             30
+ Lekki  | Dr. Elizabeth Olawale    |            16 |             30
+ Lekki  | Dr. Stephen Eze          |            15 |             32
+ Lekki  | Dr. Joy Nnamani          |            15 |             32
+ Lekki  | Dr. Samuel Chukwu        |            14 |             34
+ Lekki  | Dr. Grace Chukwu         |            12 |             35
+ Lekki  | Dr. John Balogun         |            12 |             35
+ Lekki  | Dr. Stephen Ekwueme      |            10 |             37
+ Lekki  | Dr. Gloria Chukwu        |            10 |             37
+ Lekki  | Dr. Peter Okonkwo        |            10 |             37
+ Lekki  | Dr. Blessing Eze         |             8 |             40
+ Lekki  | Dr. Deborah Obi          |             6 |             41
+ Lekki  | Dr. Peter Ekwueme        |             5 |             42
+ Yaba   | Dr. James Okafor         |           512 |              1
+ Yaba   | Dr. Gloria Oshodi        |           506 |              2
+ Yaba   | Dr. Daniel Akinwale      |           449 |              3
+ Yaba   | Dr. Patience Okafor      |           436 |              4
+ Yaba   | Dr. Ruth Ojo             |           400 |              5
+ Yaba   | Dr. Elizabeth Adetokunbo |           365 |              6
+ Yaba   | Dr. Gabriel Ojo          |           333 |              7
+ Yaba   | Dr. Agnes Balogun        |           268 |              8
+ Yaba   | Dr. Grace Chukwu         |           257 |              9
+ Yaba   | Dr. Gloria Chukwu        |           201 |             10
+ Yaba   | Dr. Samuel Chukwu        |           197 |             11
+ Yaba   | Dr. John Balogun         |           194 |             12
+ Yaba   | Dr. Deborah Obi          |           177 |             13
+ Yaba   | Dr. Blessing Eze         |           154 |             14
+ Yaba   | Dr. Andrew Okafor        |            32 |             15
+ Yaba   | Dr. Mary Adetokunbo      |            31 |             16
+ Yaba   | Dr. Blessing Nnamani     |            27 |             17
+ Yaba   | Dr. Simon Olawale        |            24 |             18
+ Yaba   | Dr. Comfort Abiola       |            24 |             18
+ Yaba   | Dr. Andrew Ogunleye      |            23 |             20
+ Yaba   | Dr. Comfort Okafor       |            22 |             21
+ Yaba   | Dr. Peace Okafor         |            22 |             21
+ Yaba   | Dr. Peace Olawale        |            21 |             23
+ Yaba   | Dr. Stephen Eze          |            21 |             23
+ Yaba   | Dr. Michael Adetokunbo   |            20 |             25
+ Yaba   | Dr. John Obi             |            19 |             26
+ Yaba   | Dr. Elizabeth Olawale    |            19 |             26
+ Yaba   | Dr. Nathaniel Olawale    |            18 |             28
+ Yaba   | Dr. Joy Nnamani          |            18 |             28
+ Yaba   | Dr. Andrew Oshodi        |            18 |             28
+ Yaba   | Dr. Grace Balogun        |            17 |             31
+ Yaba   | Dr. Emmanuel Balogun     |            13 |             32
+ Yaba   | Dr. David Adeyemi        |            13 |             32
+ Yaba   | Dr. David Abiola         |            13 |             32
+ Yaba   | Dr. Patience Nnamani     |            13 |             32
+ Yaba   | Dr. Joseph Adetokunbo    |             9 |             36
+ Yaba   | Dr. Peter Okonkwo        |             8 |             37
+ Yaba   | Dr. Blessing Adetokunbo  |             7 |             38
+ Yaba   | Dr. Samuel Okafor        |             6 |             39
+ Yaba   | Dr. Faith Nnamani        |             6 |             39
+ Yaba   | Dr. Peter Ekwueme        |             5 |             41
+ Yaba   | Dr. Stephen Ekwueme      |             4 |             42
+(126 rows)
+
+ hospital_no |     full_name     | bp_systolic | bp_diastolic |     recorded_at     
+-------------+-------------------+-------------+--------------+---------------------
+ CP-013070   | Joshua Chukwu     |         185 |          142 | 2026-10-07 11:30:00
+ CP-017730   | Victoria Olawale  |         185 |          139 | 2026-10-07 09:00:00
+ CP-000778   | Peter Nnamani     |         185 |          128 | 2026-10-06 14:00:00
+ CP-003195   | Faith Ogunleye    |         185 |          139 | 2026-10-06 10:00:00
+ CP-003775   | Charity Adeyemi   |         185 |          127 | 2026-10-03 10:00:00
+ CP-010740   | Angela Oshodi     |         185 |          134 | 2026-09-28 14:00:00
+ CP-007625   | Joseph Uche       |         185 |          138 | 2026-09-28 10:30:00
+ CP-000664   | Joseph Obi        |         185 |          155 | 2026-09-28 09:30:00
+ CP-019146   | Agnes Adetokunbo  |         185 |          136 | 2026-09-28 09:00:00
+ CP-007429   | Faith Balogun     |         185 |          141 | 2026-09-25 14:30:00
+ CP-018164   | Joy Abiola        |         185 |          139 | 2026-09-25 11:30:00
+ CP-019511   | Peter Akinwale    |         185 |          137 | 2026-09-25 10:00:00
+ CP-009485   | Michael Akinwale  |         185 |          151 | 2026-09-23 14:00:00
+ CP-000978   | Nathaniel Balogun |         185 |          137 | 2026-09-22 14:30:00
+ CP-002684   | Ruth Olawale      |         185 |          126 | 2026-09-22 08:30:00
+ CP-016638   | Michael Uche      |         185 |          140 | 2026-09-16 08:00:00
+ CP-000219   | Charity Eze       |         185 |          141 | 2026-09-12 09:30:00
+ CP-010142   | Peter Nnamani     |         185 |          153 | 2026-09-10 15:30:00
+ CP-010875   | Peace Obasanjo    |         185 |          136 | 2026-09-01 10:30:00
+ CP-000544   | Juliet Okafor     |         185 |          128 | 2026-08-25 09:30:00
+(20 rows)
+
