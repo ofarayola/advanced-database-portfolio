@@ -160,6 +160,34 @@
   in VS Code. Lesson: a PC can have several Pythons, and the editor, pip and the terminal
   must all use the same one.
 
+  ## Week 2 (9 Oct 2026): Portfolio 3 — Transactions (session 1)
+
+### What I demonstrated
+- **COMMIT (Demo 1):** dispensing as one transaction (prescription + item + stock + invoice).
+  While Ada's transaction was open she saw stock 4264 but Bayo still saw 4288: no dirty read.
+  After COMMIT all four changes appeared to Bayo at once.
+- **ROLLBACK (Demo 2):** trying to dispense 5000 tablets broke chk_stock_not_negative.
+  PostgreSQL then refused every further command until ROLLBACK, and the rollback also
+  removed the prescription and item that had been inserted successfully. Atomicity.
+- **SAVEPOINT (Demo 3):** rolled back only the failed inhaler line and still committed
+  the Paracetamol, so one bad item no longer cancels the whole prescription.
+
+### Things I noticed
+- PostgreSQL never allows dirty reads; READ UNCOMMITTED behaves as READ COMMITTED.
+- Sequence values are not rolled back: Demo 2 got prescription 35372 because 35371 had
+  been used by an abandoned transaction. Gaps in IDs are normal and safe.
+- Bayo's own open transaction saw Ada's change as soon as she committed. In READ COMMITTED
+  each statement sees the latest committed data, which leads to non-repeatable reads (next session).
+- After an UPDATE the row order changed: PostgreSQL's MVCC writes a new row version
+  instead of overwriting, which is also what makes isolation possible.
+
+### Challenges
+- Setting \set PROMPT1 'A=> ' hid the transaction indicator; 'A%x=> ' shows * and !.
+- I typed CLS inside psql, which started an unfinished statement (carepoint-#); \r
+  cleared it. \! cls is the psql way to clear the screen.
+- A forgotten open transaction caused "there is already a transaction in progress";
+  I learned to check the prompt for * before typing BEGIN.
+
 ## AI use log
 | Date | Tool | What I used it for | How I checked or changed it |
 |---|---|---|---|
@@ -172,3 +200,4 @@
 | 6–7 Oct | Claude | Structuring the normalisation write-up, P1 README and main README | Checked every functional dependency against my own tables; matched screenshot names to my files; filled in my own details |
 | 8 Oct | Claude | Python data generator for P2 | Read each section, ran it, verified row counts and status distribution in psql |
 | 8–9 Oct | Claude | Index design, Q2 rewrite, explaining the idx_scan counts, results and README structure | Ran every script, compared all numbers with my own plans, tested the planner-statistics explanation myself |
+| 9 Oct | Claude | Designing Demos 1–3 and explaining psql prompts and errors | Ran every step in two sessions, checked each result against the expected values, fixed a wrong ID in my own verification query |
