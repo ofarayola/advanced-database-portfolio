@@ -12,18 +12,18 @@
 
 -- [A1] Terminal A
 BEGIN;
-SELECT quantity_on_hand FROM clinic.pharmacy_stock
+SELECT quantity_on_hand FROM clinic.drug_stock
 WHERE branch_id = 1 AND drug_id = 3;          -- result: 4154
 
 -- [B1] Terminal B
 BEGIN;
-UPDATE clinic.pharmacy_stock
+UPDATE clinic.drug_stock
 SET quantity_on_hand = quantity_on_hand - 15
 WHERE branch_id = 1 AND drug_id = 3;
 COMMIT;                                        -- stock now 4139
 
 -- [A2] Terminal A: same query, same transaction
-SELECT quantity_on_hand FROM clinic.pharmacy_stock
+SELECT quantity_on_hand FROM clinic.drug_stock
 WHERE branch_id = 1 AND drug_id = 3;          -- result: 4139  (changed!)
 COMMIT;
 
@@ -37,25 +37,25 @@ COMMIT;
 
 -- [A1] Terminal A
 BEGIN ISOLATION LEVEL REPEATABLE READ;
-SELECT quantity_on_hand FROM clinic.pharmacy_stock
+SELECT quantity_on_hand FROM clinic.drug_stock
 WHERE branch_id = 1 AND drug_id = 3;          -- result: 4139
 
 -- [B1] Terminal B
 BEGIN;
-UPDATE clinic.pharmacy_stock
+UPDATE clinic.drug_stock
 SET quantity_on_hand = quantity_on_hand - 15
 WHERE branch_id = 1 AND drug_id = 3;
 COMMIT;
-SELECT quantity_on_hand FROM clinic.pharmacy_stock
+SELECT quantity_on_hand FROM clinic.drug_stock
 WHERE branch_id = 1 AND drug_id = 3;          -- Bayo sees 4124
 
 -- [A2] Terminal A: same query, same transaction
-SELECT quantity_on_hand FROM clinic.pharmacy_stock
+SELECT quantity_on_hand FROM clinic.drug_stock
 WHERE branch_id = 1 AND drug_id = 3;          -- result: still 4139
 COMMIT;
 
 -- [A3] Terminal A: new transaction
-SELECT quantity_on_hand FROM clinic.pharmacy_stock
+SELECT quantity_on_hand FROM clinic.drug_stock
 WHERE branch_id = 1 AND drug_id = 3;          -- result: 4124
 
 -- Observation: under REPEATABLE READ the snapshot is taken at the first
