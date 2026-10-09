@@ -1,0 +1,16 @@
+-- Demo 5a: FIX 1 - atomic update (database does the arithmetic)
+-- Start 4244. Ada -10, Bayo -20 -> correct 4214.
+-- [A] BEGIN;
+-- [A] UPDATE drug_stock SET quantity_on_hand = quantity_on_hand - 10 WHERE branch_id = 1 AND drug_id = 3;
+-- [B] BEGIN;
+-- [B] UPDATE drug_stock SET quantity_on_hand = quantity_on_hand - 20 WHERE branch_id = 1 AND drug_id = 3;
+-- [A] COMMIT;
+-- [B] COMMIT;
+-- [A]/[B] SELECT quantity_on_hand ...   -> 4214 (correct, nothing lost)
+-- Why it works: SET quantity_on_hand = quantity_on_hand - n is calculated by the
+-- database from the CURRENT committed value at the moment of writing. If the row
+-- is locked by another transaction, the UPDATE waits, then re-reads the latest
+-- committed value before subtracting. Contrast with Demo 4: SET = 4244 (a fixed
+-- number worked out from a stale read) could not be recalculated.
+-- Limitation: only works when the change can be written as one UPDATE. If the app
+-- must READ first and decide (e.g. "is there enough stock?"), use Fix 2 or 3.

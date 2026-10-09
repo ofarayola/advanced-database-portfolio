@@ -31,7 +31,7 @@ must be measured rather than assumed.
 Requires the Portfolio 1 schema (`portfolio-1-database-design/schema.sql`).
 
 ```powershell
-$env:PGPASSWORD = "your_password"
+$env:PGPASSWORD = "my_password"
 
 # 1. Load the large dataset (replaces any existing data)
 python portfolio-2-query-optimisation/generate_data.py

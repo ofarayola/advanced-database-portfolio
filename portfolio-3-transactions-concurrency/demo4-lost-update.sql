@@ -1,0 +1,42 @@
+-- =====================================================================
+-- Demo 4: LOST UPDATE - two pharmacists dispense the same drug at once
+-- Portfolio 3 - Transactions and Concurrency (default READ COMMITTED)
+-- Session A = Pharmacist Ada, Session B = Pharmacist Bayo
+-- The "application" reads the stock, calculates the new value itself,
+-- then writes that fixed number back (read - calculate - write).
+-- =====================================================================
+-- Starting stock: drug_stock branch 1, drug 3 = 4264
+-- Ada dispenses 10, Bayo dispenses 20 -> correct result 4264 - 30 = 4234
+
+-- [A] BEGIN;
+-- [B] BEGIN;
+-- [A] SELECT quantity_on_hand FROM drug_stock WHERE branch_id = 1 AND drug_id = 3;  -> 4264
+-- [B] SELECT quantity_on_hand FROM drug_stock WHERE branch_id = 1 AND drug_id = 3;  -> 4264
+--     (both read the same value; each calculates a new stock in the app)
+-- [A] UPDATE drug_stock SET quantity_on_hand = 4254 WHERE branch_id = 1 AND drug_id = 3;  -- 4264-10
+-- [A] COMMIT;                                   -> committed stock 4254
+-- [B] UPDATE drug_stock SET quantity_on_hand = 4244 WHERE branch_id = 1 AND drug_id = 3;  -- 4264-20
+-- [B] COMMIT;
+-- [B] SELECT quantity_on_hand ...               -> 4244   (should be 4234)
+
+-- Timeline
+-- | Step                | Ada            | Bayo                 | Stock |
+-- |---------------------|----------------|----------------------|-------|
+-- | Start               |                |                      | 4264  |
+-- | Both read           | sees 4264      | sees 4264            | 4264  |
+-- | Ada writes, commits | sets 4254      |                      | 4254  |
+-- | Bayo writes, commits|                | sets 4244 (stale)    | 4244  |
+-- | Correct value       |                |                      | 4234  |
+
+-- What this demonstrates
+-- 1. LOST UPDATE: Bayo calculated his new value from 4264, which was out of date
+--    once Ada committed. His write overwrote Ada's, so her 10 tablets vanished
+--    from the records: the system shows 10 more tablets than are on the shelf.
+-- 2. READ COMMITTED (PostgreSQL's default) does not prevent this. Each statement
+--    sees committed data, but nothing checks that the value Bayo READ is still
+--    the current value when he WRITES.
+-- 3. A single user cannot cause this. An earlier attempt run in one session only
+--    gave the correct result; it needs two overlapping transactions.
+-- 4. Root cause: the application does the arithmetic on a stale value.
+--    Demo 5 shows three fixes.
+-- =====================================================================

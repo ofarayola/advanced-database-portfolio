@@ -1,0 +1,17 @@
+-- Demo 5b: FIX 2 - SELECT ... FOR UPDATE (pessimistic locking)
+-- Start 4214. Ada -10, Bayo -20 -> correct 4184.
+-- [A] BEGIN;
+-- [A] SELECT quantity_on_hand FROM drug_stock WHERE branch_id = 1 AND drug_id = 3 FOR UPDATE;  -> 4214 (row now locked by A)
+-- [B] BEGIN;
+-- [B] SELECT quantity_on_hand FROM drug_stock WHERE branch_id = 1 AND drug_id = 3 FOR UPDATE;  -> waits for A's lock
+-- [A] UPDATE drug_stock SET quantity_on_hand = 4204 WHERE branch_id = 1 AND drug_id = 3;      -- 4214 - 10
+-- [A] COMMIT;                                   -> lock released
+-- [B] ... SELECT returns 4204                   -> B reads the FRESH value, not 4214
+-- [B] UPDATE drug_stock SET quantity_on_hand = 4184 WHERE branch_id = 1 AND drug_id = 3;      -- 4204 - 20
+-- [B] COMMIT;
+-- SELECT quantity_on_hand ...                   -> 4184 (correct)
+-- Why it works: the same read-calculate-write pattern as Demo 4, but the lock is
+-- taken at the READ. A second transaction cannot read the row FOR UPDATE until
+-- the first commits, so it always calculates from the current value.
+-- Use when the app must check the value first (e.g. "is there enough stock?").
+-- Cost: other users wait, so keep FOR UPDATE transactions short.

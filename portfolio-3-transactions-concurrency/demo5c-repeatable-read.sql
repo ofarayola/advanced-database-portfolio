@@ -1,0 +1,25 @@
+-- Demo 5c: FIX 3 - REPEATABLE READ (optimistic concurrency control)
+-- Start 4184. Ada -10, Bayo -20 -> correct 4154.
+-- [A] BEGIN ISOLATION LEVEL REPEATABLE READ;
+-- [A] SELECT quantity_on_hand ...                -> 4184 (snapshot taken)
+-- [B] BEGIN ISOLATION LEVEL REPEATABLE READ;
+-- [B] SELECT quantity_on_hand ...                -> 4184 (snapshot taken)
+-- [A] UPDATE drug_stock SET quantity_on_hand = 4174 WHERE branch_id = 1 AND drug_id = 3;  -- 4184 - 10
+-- [A] COMMIT;
+-- [B] UPDATE drug_stock SET quantity_on_hand = 4164 WHERE branch_id = 1 AND drug_id = 3;  -- stale 4184 - 20
+--     -> ERROR: could not serialize access due to concurrent update   (prompt B!=>)
+-- [B] ROLLBACK;
+-- Retry:
+-- [B] BEGIN ISOLATION LEVEL REPEATABLE READ;
+-- [B] SELECT quantity_on_hand ...                -> 4174 (fresh snapshot)
+-- [B] UPDATE drug_stock SET quantity_on_hand = 4154 WHERE branch_id = 1 AND drug_id = 3;  -- 4174 - 20
+-- [B] COMMIT;
+-- SELECT quantity_on_hand ...                    -> 4154 (correct)
+--
+-- Same order of events as Demo 4, different isolation level:
+--   READ COMMITTED  -> Bayo's stale write ALLOWED  -> lost update (Demo 4)
+--   REPEATABLE READ -> Bayo's stale write REJECTED -> retry -> correct
+-- Why: under REPEATABLE READ a transaction works from a snapshot taken at its first
+-- query. If it tries to update a row that another transaction changed and committed
+-- after that snapshot, PostgreSQL aborts it instead of overwriting.
+-- Cost: the application must catch this error and RETRY the whole transaction.
