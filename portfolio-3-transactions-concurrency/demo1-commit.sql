@@ -1,0 +1,14 @@
+-- Demo 1: COMMIT - dispensing as one atomic transaction
+-- Session A = Pharmacist Ada, Session B = Pharmacist Bayo
+-- Starting stock (branch 1, drug 3 Artemether/Lumefantrine): 4288
+
+-- [A] BEGIN;
+-- [A] INSERT INTO prescription (consultation_id) VALUES (41573) RETURNING prescription_id;   -- 35370
+-- [A] INSERT INTO prescription_item (prescription_id, drug_id, quantity, dosage_instructions)
+--     VALUES (35370, 3, 24, '4 tablets twice daily for 3 days');
+-- [A] UPDATE drug_stock SET quantity_on_hand = quantity_on_hand - 24 WHERE branch_id = 1 AND drug_id = 3;
+-- [A] UPDATE invoice SET total_amount = total_amount + 4800, status = 'part_paid' WHERE invoice_id = 41573;
+-- [A] SELECT quantity_on_hand ...   -- 4264 (A sees own changes)
+-- [B] SELECT quantity_on_hand ...   -- 4288 (B cannot see uncommitted work: no dirty read)
+-- [A] COMMIT;
+-- [B] SELECT quantity_on_hand ...   -- 4264 (now visible to everyone)
