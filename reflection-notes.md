@@ -160,9 +160,11 @@
   in VS Code. Lesson: a PC can have several Pythons, and the editor, pip and the terminal
   must all use the same one.
 
-  ## Week 2 (9 Oct 2026): Portfolio 3 — Transactions (session 1)
+## Week 2–3 (9–12 Oct 2026): Portfolio 3 — Transactions and Concurrency
 
-### What I demonstrated
+### Session 1 (9 Oct): ACID basics (Demos 1–3)
+
+**What I demonstrated**
 - **COMMIT (Demo 1):** dispensing as one transaction (prescription + item + stock + invoice).
   While Ada's transaction was open she saw stock 4264 but Bayo still saw 4288: no dirty read.
   After COMMIT all four changes appeared to Bayo at once.
@@ -172,21 +174,138 @@
 - **SAVEPOINT (Demo 3):** rolled back only the failed inhaler line and still committed
   the Paracetamol, so one bad item no longer cancels the whole prescription.
 
-### Things I noticed
+**Things I noticed**
 - PostgreSQL never allows dirty reads; READ UNCOMMITTED behaves as READ COMMITTED.
 - Sequence values are not rolled back: Demo 2 got prescription 35372 because 35371 had
   been used by an abandoned transaction. Gaps in IDs are normal and safe.
 - Bayo's own open transaction saw Ada's change as soon as she committed. In READ COMMITTED
-  each statement sees the latest committed data, which leads to non-repeatable reads (next session).
+  each statement sees the latest committed data, which leads to non-repeatable reads (Session 2).
 - After an UPDATE the row order changed: PostgreSQL's MVCC writes a new row version
   instead of overwriting, which is also what makes isolation possible.
 
-### Challenges
+**Challenges**
 - Setting \set PROMPT1 'A=> ' hid the transaction indicator; 'A%x=> ' shows * and !.
 - I typed CLS inside psql, which started an unfinished statement (carepoint-#); \r
   cleared it. \! cls is the psql way to clear the screen.
 - A forgotten open transaction caused "there is already a transaction in progress";
   I learned to check the prompt for * before typing BEGIN.
+
+### Session 2 (9 Oct): Concurrency anomalies and fixes (Demos 4–6)
+
+**What I did**
+- Reproduced a **lost update** (Demo 4) with two psql sessions: Bayo read the stock
+  before Ada committed, then wrote back a value calculated from that old read.
+  Stock ended at 4244 instead of 4234, so 10 units of Artemether/Lumefantrine
+  disappeared from the records without any error.
+- Fixed the same scenario three ways:
+  - **5a, atomic update:** `SET quantity_on_hand = quantity_on_hand - n`. The database
+    does the read and the write in one step.
+  - **5b, `SELECT … FOR UPDATE`** (pessimistic locking): Bayo's session waited until
+    Ada committed, then read the correct value.
+  - **5c, REPEATABLE READ** (optimistic): Bayo got
+    `could not serialize access due to concurrent update`. After ROLLBACK and a retry,
+    the result was correct.
+- Showed a **non-repeatable read** (Demo 6). Under READ COMMITTED, Ada read 4154 and
+  then 4139 inside one transaction. Under REPEATABLE READ, she kept seeing 4139 while
+  Bayo had already committed 4124.
+
+**What I learned**
+- The most striking result: Demo 4 and Demo 5c had **the same order of events** but
+  opposite outcomes. Only the isolation level changed. Under READ COMMITTED the
+  conflict went unnoticed and data was lost. Under REPEATABLE READ, PostgreSQL detected
+  it and refused. Isolation level is a real correctness decision, not a setting to
+  ignore.
+- A lost update raises no error, which is what makes it dangerous. Nothing in the
+  output warned me. I only caught it because I worked out the expected value by hand.
+- The three fixes have different costs. Atomic update is simplest, but it only works
+  when the new value can be computed in a single statement. FOR UPDATE is safe but
+  makes other sessions wait, which could slow a busy pharmacy. REPEATABLE READ avoids
+  waiting, but the application must catch the error and retry.
+- MVCC means old and new row versions exist side by side. Each transaction sees the
+  version its snapshot allows. That's why Ada and Bayo saw different numbers at the
+  same moment, and neither was "wrong".
+- For CarePoint, I would use atomic updates (with a CHECK that stock can't go
+  negative) for dispensing, and REPEATABLE READ for end-of-day stock reports that
+  must be internally consistent.
+
+**Challenges**
+- My first Demo 4 attempt ran the steps without real overlap, so no anomaly appeared.
+  I learned that the interleaving (read before the other commits, write after) is
+  what creates the problem.
+- Keeping track of which terminal was inside a transaction. The `A%x=> ` prompt
+  (showing `*`) helped a lot.
+- Recording a stock trail (4288 → … → 4124) made every result checkable instead of
+  guessed.
+
+### Session 3 (9 and 12 Oct): Deadlock, write skew and triggers (Demos 7–9)
+
+**What I did**
+- **Demo 7, deadlock:** Ada updated drug 3 then drug 1 while Bayo updated drug 1 then
+  drug 3. PostgreSQL detected the cycle after about one second, aborted Bayo
+  (`ERROR: deadlock detected`) and undid all of his work. I then showed the fix: when
+  both sessions update rows in ascending `drug_id` order, Bayo only waits briefly and
+  no deadlock happens (final stock: drug 1 = 3345, drug 3 = 4074).
+- **Demo 8, write skew:** two cashiers both saw a balance of ₦10,750 on invoice 11 and
+  both recorded a full payment. Under REPEATABLE READ both commits succeeded, so the
+  patient paid ₦21,500. Under SERIALIZABLE, Bayo's COMMIT failed with
+  `could not serialize access due to read/write dependencies`. His retry showed a
+  balance of 0.00, so only one payment was kept.
+- **Demo 9, triggers:** I created two triggers on `clinic.payment`. One keeps
+  `invoice.status` correct after every insert, update or delete. The other blocks
+  overpayment by locking the invoice row first. An audit query found invoice 11 still
+  marked `unpaid`, and I fixed it. In the tests, the status changed automatically,
+  an overpayment was rejected, and the Demo 8 double payment was blocked even at the
+  default READ COMMITTED level.
+- Wrote the P3 README with a results table, an isolation-level table, a comparison of
+  fixes and recommendations for CarePoint.
+
+**What I learned**
+- **Waiting is not the problem; cycles are.** In Demo 7B Bayo still waited, but because
+  both sessions locked rows in the same order, a cycle could not form. A simple coding
+  rule (sort prescription items by `drug_id`) prevents deadlocks completely.
+- **Write skew is harder to spot than a lost update.** Nothing was overwritten and no
+  error appeared. Each transaction was correct on its own, but together they broke a
+  rule that covers several rows (total payments must not exceed the invoice). That is
+  why REPEATABLE READ, which caught the lost update in Demo 5c, missed it.
+- **Each isolation level catches one more problem.** READ COMMITTED missed the lost
+  update (Demo 4). REPEATABLE READ caught it (5c) but missed write skew (8A).
+  SERIALIZABLE caught write skew (8B). Same steps, different level, different outcome.
+- **The database can protect the rule itself.** The trigger's `FOR UPDATE` lock made
+  payments for the same invoice take turns, so the double payment was stopped without
+  SERIALIZABLE and without retry code. It is the Demo 5b idea (pessimistic locking)
+  applied to a write-skew problem.
+- **Design decisions have consequences later.** In P1 I stored `invoice.status` for
+  fast queries and wrote that it could drift. Demo 8 showed it really did drift, and
+  Demo 9 added the control I had promised. This connected the design, transaction and
+  integrity parts of the module for me.
+- **Sequences never go backwards.** Payment IDs 39542 and 39543 (deleted) and the
+  failed inserts left gaps, which is why 39544 and 39549 were the next IDs. IDs should
+  not be used as gap-free receipt numbers.
+
+**Challenges**
+- **I forgot Ada's COMMIT in Demo 7.** The prompt stayed `A*=>`, so her Part A and
+  Part B work became one transaction, and Part B did not prove the fix. Final numbers
+  were still correct, but the evidence was weak. I re-ran Part B cleanly and recorded
+  the mistake in the script. Lesson: check the `*` in the prompt before every step.
+- **I typed PowerShell commands inside psql.** The `$env:` and `psql` lines went into
+  the query buffer and the prompt changed to `carepoint-#`. I learned that `-#` means
+  an unfinished statement and that `\r` clears it.
+- **Wrong table name in my notes.** The Demo 6 script referred to `pharmacy_stock`, but
+  the real table is `drug_stock`. I fixed it with Find and Replace. Checking names
+  against the schema matters even in comments.
+- Understanding why a trigger needs two separate statements (lock the invoice first,
+  then sum the payments) took some thought. The second statement takes a fresh
+  snapshot after the wait, so it can see the other cashier's committed payment.
+
+### P3 overall reflection
+Before P3, I thought transactions were just "BEGIN and COMMIT". Running two terminals
+side by side showed me that the hard problems only appear when sessions overlap in
+time, and that some of them (lost update, write skew) give no error at all. The most
+useful habit I built was keeping a running trail of expected values (stock 4288 →
+… → 4074, payment IDs). It let me prove each anomaly with numbers instead of
+assuming. For a real clinic, I would combine atomic updates, a fixed lock order and
+database triggers, and keep SERIALIZABLE with retries for rules that span several
+rows.
 
 ## AI use log
 | Date | Tool | What I used it for | How I checked or changed it |
@@ -201,3 +320,12 @@
 | 8 Oct | Claude | Python data generator for P2 | Read each section, ran it, verified row counts and status distribution in psql |
 | 8–9 Oct | Claude | Index design, Q2 rewrite, explaining the idx_scan counts, results and README structure | Ran every script, compared all numbers with my own plans, tested the planner-statistics explanation myself |
 | 9 Oct | Claude | Designing Demos 1–3 and explaining psql prompts and errors | Ran every step in two sessions, checked each result against the expected values, fixed a wrong ID in my own verification query |
+| 9 Oct | Claude | Explaining why my first lost-update attempt (Demo 4) showed no anomaly | Learned the read/write interleaving is what matters; re-ran it myself in two terminals and verified the 10-unit loss by calculation |
+| 9 Oct | Claude | Suggesting three fixes for the lost update (Demos 5a–5c) with SQL templates | Ran each fix, checked final stock values against my own trail, and compared the trade-offs in my own words |
+| 9 Oct | Claude | Non-repeatable read script (Demo 6) and explanation of MVCC snapshots | Executed both isolation levels, captured screenshots, and confirmed the values (4154→4139 vs 4139 kept) myself |
+| 9 Oct | Claude | Checking the schema and correcting the table name in my Demo 6 script | Changed `pharmacy_stock` to `drug_stock` in the file myself |
+| 9 Oct | Claude | Deadlock and lock-ordering steps (Demo 7) and reviewing my screenshot | AI spotted that I had skipped Ada's COMMIT, so Part B did not prove the fix; I re-ran Part B myself and documented the mistake |
+| 9 Oct | Claude | Explaining why my psql prompt changed to `carepoint-#` | Learned the PowerShell lines had gone into the query buffer; cleared it with `\r` |
+| 9 Oct | Claude | Designing the double-payment (write skew) scenario for Demo 8 | Ran both isolation levels, captured the evidence, and checked payment IDs and totals myself |
+| 12 Oct | Claude | Trigger functions and test plan for Demo 9 | Ran the setup and all four tests, confirmed each status change and error, and linked the result back to my P1 design trade-off |
+| 12 Oct | Claude | Drafting the P3 README from my recorded results | Checked the Demo 1–3 details and screenshot names against my own files before committing |
