@@ -307,6 +307,137 @@ assuming. For a real clinic, I would combine atomic updates, a fixed lock order 
 database triggers, and keep SERIALIZABLE with retries for rules that span several
 rows.
 
+## Week 3 (14 Oct 2026): Portfolio 4 — NoSQL with MongoDB
+
+### Session 1: Document model and migration
+
+**What I did**
+- Redesigned the 18 PostgreSQL tables as 6 MongoDB collections (`data-model.md`). The
+  main collection, `visits`, holds one appointment with its consultation, vital signs,
+  lab orders and results, prescription items, invoice and payments **embedded**.
+- Wrote `migrate_to_mongo.py`, which reads PostgreSQL, builds the documents and checks
+  the counts. All six checks matched (20,000 patients, 60,000 visits, 41,576
+  consultations and invoices, 33,487 lab orders, 39,544 payments).
+- Confirmed that my P3 work carried over: invoice 11 was `paid` with one payment, and
+  drug 3 at Ikeja was 4074, the end of my stock trail.
+
+**Design decisions**
+- **Embed what is read together and bounded:** a visit's parts are always shown
+  together and a visit only has a few of each, so one read replaces joining 8 tables.
+- **Reference what grows without limit:** a patient's visits keep growing for years
+  (and MongoDB has a 16 MB document limit), so visits point to the patient instead of
+  sitting inside the patient document.
+- **Extended references:** each visit copies the patient's, doctor's and branch's
+  display names. Lists need no joins, but a name change would need `updateMany`. This
+  is deliberate duplication: the opposite of what I did in P1.
+- **Stock embedded in the drug document** (3 branches, fixed size), so a dispense
+  changes only one document and is atomic without a transaction.
+- **Polymorphic lab results:** each test type has its own fields. In P1 every result
+  was a single TEXT value, so this is where a document model clearly helps.
+- **Money as Decimal128**, to avoid floating-point rounding, matching NUMERIC in P1.
+
+**Being honest about the data**
+- P2 only stored a summary word per lab result, so the detailed values are simulated
+  (`random.seed(42)`) to agree with that word. I documented this in the design.
+- I noticed generator quirks in my own output: visit 2 has two vital-sign records at
+  the same minute with weights of 49.8 kg and 71.8 kg, and a Full Blood Count is
+  marked "Negative". I recorded these as limitations rather than hiding them.
+
+**Challenges**
+- **The migration printed nothing.** The file in VS Code had not been saved, so Python
+  ran an empty file. Saving with Ctrl+S fixed it. Lesson: a white dot on the tab means
+  unsaved.
+- **I typed `cd ..` inside mongosh** and got a SyntaxError. mongosh only understands
+  JavaScript; I had to `exit` back to PowerShell first. I now check the prompt:
+  `PS C:\>` is PowerShell, `carepoint=>` is psql, `carepoint>` is mongosh.
+
+### Session 2: Queries and indexes
+
+**What I did**
+- Rewrote the **same 8 questions as P2** in `queries.js`. All gave **identical answers**
+  to PostgreSQL (e.g. Ikeja, January 2025: 482 invoices, ₦10,361,380). Q7 used
+  `$setWindowFields` with `$rank` in place of `RANK() OVER`.
+- Added two MongoDB-only queries: Q9 finds Full Blood Counts with Hb below 10 g/dL (a
+  field that only exists in FBC results), and Q10 uses `$lookup` to join patients to
+  visits.
+- Measured 7 queries before and after indexing with `explain("executionStats")`,
+  3 runs each with the median reported, the same method as P2.
+
+**What I learned**
+- **Selective queries gain the most:** Q1 went from examining 60,000 documents to 12,
+  and from 110 ms to 1 ms. Q3 (a third of all visits) stayed at about 164 ms with no
+  index, the same lesson as P2.
+- **Index field order matters:** with the equality field first and the sort field
+  second, Q1's plan had no SORT stage because the index already returned visits newest
+  first.
+- **Multikey indexes work on arrays:** Q5 found 106 outstanding lab orders by reading
+  only 89 visits, because some visits hold two orders. In P2 this needed a 5-table join.
+- **Joins still need indexes:** Q10's `$lookup` used a NestedLoopJoin over 80,000
+  documents until I indexed the foreign field, then took 2 ms.
+- **My size estimate was right:** 57.9 MB ÷ 60,000 = 965 bytes per visit, exactly
+  what the design predicted.
+- I reported one figure I could not fully explain (112 documents examined by the
+  `$lookup` for a patient with 12 visits) rather than adjusting it.
+
+**Challenges**
+- `mongosh` was "not recognised" in one terminal although it worked in another. VS Code
+  terminals keep the PATH they started with, so I used a standalone PowerShell window.
+
+### Session 3: Atomic updates and schema validation
+
+**What I did**
+- **Demo A:** two mongosh windows each removed 1 unit 5,000 times from a counter of
+  10,000. With read-then-write (`findOne` + `$set`), the final value was **4,260
+  instead of 0**: 42.6% of updates lost, with no error. With `$inc`, the result was
+  exactly **0**, and it was about 3.4× faster (~7 s vs ~24 s).
+- Dispensed 20 tablets of drug 3 with a conditional `$inc` (4074 → 4054). The same
+  update for 5,000 matched **0 documents** and changed nothing.
+- **Demo B:** wrote `$jsonSchema` rules matching 7 of my P1 CHECK constraints. The audit
+  found 0 existing visits breaking them. After I switched validation on, tests T1–T6
+  (including an UPDATE) were rejected, and T7, a valid visit for a patient who does
+  not exist, was accepted.
+
+**What I learned**
+- **Single-document atomicity is not enough on its own.** Every write in Demo A Part 1
+  was atomic, yet nearly half the updates were lost, because the program split one
+  change into a read and a write. This is P3's lost update again, now measured over
+  10,000 operations instead of one.
+- **MongoDB fails silently where PostgreSQL fails loudly.** PostgreSQL rejected an
+  over-dispense with an error (P3 Demo 2). MongoDB simply matched 0 documents, so the
+  application must check `matchedCount`.
+- **No foreign keys.** Validation checks the shape of a document, never whether a
+  referenced patient exists (T7). In P1 a foreign key would have rejected it.
+- **Error messages depend on how rules are written.** `$jsonSchema` errors named the
+  exact field and bad value, but my two combined `$expr` rules only said "expression
+  did not match". Separate clauses would be clearer, like one named constraint per
+  rule in P1.
+- **Two databases drift apart.** After Demo A, MongoDB holds 4054 for drug 3 while
+  PostgreSQL still holds 4074. Nothing keeps two copies in step after a one-off
+  migration, which leads directly into replication and consistency in P5.
+
+**Challenges**
+- **Pasting long one-line loops:** the first paste in each window was cut off, and one
+  had a typo (`__id`). Because that typo matched no document, it changed nothing. I
+  learned to check the end of the line before pressing Enter, and to use Ctrl+C to
+  cancel a broken paste.
+- **The validation error output is very long.** I learned to read it from the inside
+  out: `index: 0` means the `$jsonSchema` part, `index: 1` means the `$expr` part, and
+  the innermost `propertyName` / `consideredValue` shows the actual problem.
+- **Re-defining variables in a new mongosh session:** `base` and `visitRules` only
+  exist in the window where they were created.
+
+### P4 overall reflection
+Before P4 I thought NoSQL meant "no schema and no rules". I learned that a document
+model still needs careful design, but around a different question: in P1 I asked "how
+do I avoid storing anything twice?", and in P4 I asked "what does each user read
+together?". Getting identical answers to the P2 queries gave me confidence the two
+designs hold the same information. The demos showed where each system is stronger.
+MongoDB is excellent for whole-record reads and data that varies in shape, like lab
+results. PostgreSQL is stronger for billing and stock, where foreign keys, errors on
+bad data and multi-table transactions matter. For CarePoint I would keep PostgreSQL as
+the main database and use a document store for lab results and the doctor's patient
+view, with a clear process to keep the two in sync.
+
 ## AI use log
 | Date | Tool | What I used it for | How I checked or changed it |
 |---|---|---|---|
@@ -329,3 +460,9 @@ rows.
 | 9 Oct | Claude | Designing the double-payment (write skew) scenario for Demo 8 | Ran both isolation levels, captured the evidence, and checked payment IDs and totals myself |
 | 12 Oct | Claude | Trigger functions and test plan for Demo 9 | Ran the setup and all four tests, confirmed each status change and error, and linked the result back to my P1 design trade-off |
 | 12 Oct | Claude | Drafting the P3 README from my recorded results | Checked the Demo 1–3 details and screenshot names against my own files before committing |
+| 14 Oct | Claude | Document model design (`data-model.md`) and the migration script | Read the embed/reference reasoning, ran the migration, confirmed all six counts matched PostgreSQL and that my P3 changes carried over |
+| 14 Oct | Claude | Diagnosing the silent migration run and the mongosh / PATH problems | Found the unsaved file myself; used a standalone PowerShell window for mongosh |
+| 14 Oct | Claude | Rewriting the P2 queries for MongoDB (`queries.js`) and the measurement script (`explain.js`) | Checked every row count and key figure against my P2 results; ran explain before and after indexes myself |
+| 14 Oct | Claude | Turning my explain output into `results.md` | Checked every number against `explain-results.txt`; kept the unexplained `$lookup` figure as reported |
+| 14 Oct | Claude | Designing Demo A (lost update vs `$inc`) and Demo B (`$jsonSchema` validation) | Ran both demos in two windows, recorded the 4,260 lost updates and the T1–T7 results, and checked the drug 3 stock (4054) myself |
+| 14 Oct | Claude | Drafting `atomic-dispense.js`, `validation.js` and the P4 README from my results | Checked the screenshot names and figures against my own evidence before committing |
