@@ -30,10 +30,11 @@ in Lagos (Ikeja, Lekki and Yaba), offering consultations, laboratory tests and a
 | # | Portfolio | Status | Key evidence |
 |---|---|---|---|
 | 1 | [Database Design and Modelling](portfolio-1-database-design/) | ✅ Complete | ER diagram (18 tables), schema with named constraints, normalisation UNF→3NF/BCNF, 16 constraint tests passed |
-| 2 | [Query Processing and Optimisation](portfolio-2-query-optimisation/) | ✅ Complete |  8 queries, before/after EXPLAIN ANALYZE; Q1 17× and Q2 20× faster; partial indexes; PostgreSQL 18 skip scan observed |
-| 3 | [Transactions and Concurrency](portfolio-3-transactions-concurrency/) | ⏳ In Progress | — |
-| 4 | [NoSQL and Advanced Data Models](portfolio-4-nosql/) | ⬜ Not started | — |
-| 5 | [Distributed and Cloud Database](portfolio-5-distributed-cloud/) | ⬜ Not started | — |
+| 2 | [Query Processing and Optimisation](portfolio-2-query-optimisation/) | ✅ Complete | 8 queries, before/after EXPLAIN ANALYZE; Q1 17× and Q2 20× faster; partial indexes; PostgreSQL 18 skip scan observed |
+| 3 | [Transactions and Concurrency](portfolio-3-transactions-concurrency/) | ✅ Complete | 9 two-session demos: COMMIT/ROLLBACK/SAVEPOINT, lost update (10 units lost) and 3 fixes, non-repeatable read, deadlock and lock ordering, write skew blocked by SERIALIZABLE, triggers keeping invoice status in sync |
+| 4 | [NoSQL and Advanced Data Models](portfolio-4-nosql/) | ✅ Complete | MongoDB document model (18 tables → 6 collections), migration verified against PostgreSQL, same 8 queries with identical answers, indexes 110 ms → 1 ms, 4,260 lost updates vs 0 with `$inc`, `$jsonSchema` validation |
+| 5 | [Distributed and Cloud Database](portfolio-5-distributed-cloud/) | ✅ Complete | 3-node replica set: replication on all nodes, failover (clean 0/60 lost; crash 13.0 s downtime), write concerns and CAP, multi-document transaction; sharding and cloud deployment design |
+| — | Final documentation (LMS) | ⏳ In progress | 2–3 page summary, reflection and AI-use declaration |
 
 ---
 

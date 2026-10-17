@@ -438,6 +438,78 @@ bad data and multi-table transactions matter. For CarePoint I would keep Postgre
 the main database and use a document store for lab results and the doctor's patient
 view, with a clear process to keep the two in sync.
 
+## Week 4 (16–17 Oct 2026): Portfolio 5 — Distributed and Cloud Databases
+
+### Setup decision
+- Docker was not installed. I re-read the brief: it asks for a "distributed/cloud database
+  discussion **or** setup" and accepts configuration files as evidence, and never mentions
+  Docker. So I ran **3 extra `mongod` processes** on my PC (ports 27018–27020), each with
+  its own config file, instead of installing Docker (admin rights, WSL2, a restart, 1–2 GB).
+  They behave exactly like containers for elections, replication and write concerns.
+- I kept the data folders in `C:\data\rs0`, **outside the Git repo**, and capped each node's
+  memory cache at 0.25 GB because three servers share one PC.
+
+### What I did and found
+- **Replication:** after `rs.initiate`, the nodes elected 27018 as primary. I wrote the P4
+  data only to the primary, and all three nodes then held 60,000 visits. A write sent
+  directly to a secondary was refused with `not primary`.
+- **Failover:** with a loop writing every 0.5 s:
+  - **clean shutdown** of the primary (Ctrl+C): **60 of 60** writes succeeded and the primary
+    switched from 27018 to 27019 in under a second;
+  - **crash** (`Stop-Process -Force`): **55 of 60** succeeded, with a **13.0 s** gap. I
+    measured it from the saved timestamps using `$setWindowFields` and `$shift`, instead of
+    scrolling through output.
+- **Consistency:** with one node down, `w: "majority"` worked and `w: 3` timed out. With two
+  nodes down, the last node **stepped down and refused all writes** but still served reads.
+- **Transactions:** dispensing 10 tablets updated `drugs` and `visits` together
+  (4054 → 4044, invisible to others until commit). A dispense of 5,000 rolled back the visit
+  update that had already succeeded.
+
+### What I learned
+- **Clean failure and crash are very different.** A clean shutdown hands over immediately.
+  A crash makes the others wait 10 s (the election timeout) before they even start an
+  election. For CarePoint that means about 13 s without saving after a server crash, then
+  automatic recovery with no data lost.
+- **An error does not always mean "not saved", and "saved" does not always mean "safe".**
+  The `w: 3` write timed out but was stored. The "only one node left" write showed an error
+  but was saved on one node and survived only because that node won the next election;
+  otherwise it would have been rolled back. Only `w: "majority"` is guaranteed to survive.
+- **I can now explain CAP with my own evidence:** with only one node visible, MongoDB chose
+  consistency over availability (CP) to avoid split brain. In the cloud, a Lagos branch
+  that loses its internet connection would be on that minority side and unable to save.
+- **Transactions have a time limit in MongoDB.** My first transaction was aborted
+  automatically after 60 s while I took screenshots. In P3, PostgreSQL kept a forgotten
+  transaction open indefinitely (`A*=>`). MongoDB's limit protects other users, but
+  transactions must be short.
+- **Sharding is not always the answer.** At about 29 MB of visits per year, CarePoint needs
+  replication for availability, not sharding for capacity. I still designed a shard key
+  (branch + patient, with zones by region) in case the clinic grows into a national network.
+- **Replication is not a backup:** a mistaken delete is copied to every node at once.
+
+### Challenges
+- **Asking for smaller steps.** The first set of P5 instructions was too much at once, so I
+  asked for one small step at a time with a check after each. That worked much better with
+  five terminal windows open.
+- **Recognising "frozen" windows as normal:** a running `mongod` shows one log line and no
+  prompt, because its messages go to a log file.
+- **"Replica set primary: None"** from the copy script: the driver connects lazily, so it
+  hadn't discovered the primary yet. The data was still copied correctly, and the script was
+  fixed to connect first.
+- **Pasting several lines at once in mongosh only shows the last result,** so I ran
+  check queries one at a time.
+- **Typos in write-concern options** (`wtiwtimeout`, `writeConwriteConcern`) were silently
+  ignored. I left them in the evidence and explained their effect instead of hiding them.
+- **"10 secs behind the primary" while idle** looked like a problem, but it is only the
+  primary's periodic heartbeat entry; after a new write, both secondaries showed 0 s.
+
+### P5 overall reflection
+P5 made the earlier portfolios feel connected. The lost update from P3 and the 4054/4074
+drift from P4 were both about copies of data disagreeing, and P5 showed how a database keeps
+copies in agreement automatically, and what it costs: a few seconds of downtime in a crash,
+and refusing writes rather than risking split brain. Measuring things myself (13.0 s, 55 of
+60, the surviving non-majority write) taught me far more than reading the definitions of
+availability and consistency.
+
 ## AI use log
 | Date | Tool | What I used it for | How I checked or changed it |
 |---|---|---|---|
@@ -466,3 +538,8 @@ view, with a clear process to keep the two in sync.
 | 14 Oct | Claude | Turning my explain output into `results.md` | Checked every number against `explain-results.txt`; kept the unexplained `$lookup` figure as reported |
 | 14 Oct | Claude | Designing Demo A (lost update vs `$inc`) and Demo B (`$jsonSchema` validation) | Ran both demos in two windows, recorded the 4,260 lost updates and the T1–T7 results, and checked the drug 3 stock (4054) myself |
 | 14 Oct | Claude | Drafting `atomic-dispense.js`, `validation.js` and the P4 README from my results | Checked the screenshot names and figures against my own evidence before committing |
+| 16 Oct | Claude | Reading the brief's P5 requirements and choosing a setup without Docker | Re-read the brief myself (discussion or setup; configuration files accepted) and agreed with the choice |
+| 16 Oct | Claude | Node config files, `copy_to_replicaset.py` and step-by-step replica set commands | Ran every step in five windows; confirmed equal counts on all 3 nodes and drug 3 = 4054; reported the "primary: None" output, which led to a fix |
+| 16 Oct | Claude | Designing the failover, crash and write-concern tests | Ran them myself; measured the 13.0 s crash gap from my own data; checked which "failed" writes were actually saved |
+| 17 Oct | Claude | Multi-document transaction demo, and explaining the 60-second auto-abort | Re-ran the transaction, verified 4054 → 4044 and the rolled-back visit update myself |
+| 17 Oct | Claude | Drafting the P5 README (results, sharding, CAP and cloud discussion) | Checked every figure against my outputs and screenshots before committing |
