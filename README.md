@@ -34,7 +34,7 @@ in Lagos (Ikeja, Lekki and Yaba), offering consultations, laboratory tests and a
 | 3 | [Transactions and Concurrency](portfolio-3-transactions-concurrency/) | ✅ Complete | 9 two-session demos: COMMIT/ROLLBACK/SAVEPOINT, lost update (10 units lost) and 3 fixes, non-repeatable read, deadlock and lock ordering, write skew blocked by SERIALIZABLE, triggers keeping invoice status in sync |
 | 4 | [NoSQL and Advanced Data Models](portfolio-4-nosql/) | ✅ Complete | MongoDB document model (18 tables → 6 collections), migration verified against PostgreSQL, same 8 queries with identical answers, indexes 110 ms → 1 ms, 4,260 lost updates vs 0 with `$inc`, `$jsonSchema` validation |
 | 5 | [Distributed and Cloud Database](portfolio-5-distributed-cloud/) | ✅ Complete | 3-node replica set: replication on all nodes, failover (clean 0/60 lost; crash 13.0 s downtime), write concerns and CAP, multi-document transaction; sharding and cloud deployment design |
-| — | Final documentation (LMS) | ⏳ In progress | 2–3 page summary, reflection and AI-use declaration |
+| — | Final documentation (LMS) | ✅ Complete | 2–3 page summary, reflection and AI-use declaration |
 
 ---
 
